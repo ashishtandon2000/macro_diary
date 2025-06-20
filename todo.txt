@@ -1,0 +1,16 @@
+
+Bugs:
+- summary values needs to be rounded to two decimal place
+
+
+TODO:
+- Save functionality of food mgmt remains...
+- complete manage serving functionality
+- Setup repository
+- Improve UI
+
+FUTURE Addition etc:
+- Remote storage of data
+- add commonly used food items to autofilling
+- add features like BMR and and required kcal calculation etc
+- make the data set useful

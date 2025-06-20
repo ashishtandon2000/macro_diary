@@ -115,8 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => ChangeNotifierProvider(
           create: (_) => ManageFoodViewmodel(
             repo: FoodRepositoryImpl(),
-          ),
-          // )..initialLoading(id),
+          )..initialLoading(id),
           child: ManageFood(
             foodId: id,
           ),

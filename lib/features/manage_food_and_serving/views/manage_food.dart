@@ -4,66 +4,34 @@ import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_
 import 'package:macro_diary/models/food_item.dart';
 import 'package:provider/provider.dart';
 
-class ManageFood extends StatefulWidget {
+class ManageFood extends StatelessWidget {
   /// Create or edit food entry
-  const ManageFood({super.key, this.foodId});
+  ManageFood({super.key, this.foodId});
 
   /// In case of editing existing entry foodId will be passed, and in case of new entry foodId will be null
   final String? foodId;
 
-  @override
-  State<ManageFood> createState() => _ManageFoodState();
-}
-
-Map<MeasureUnit, String> _unitMap = {
-  MeasureUnit.gram: 'Per 100 gram',
-  MeasureUnit.milliliter: 'Per 100 milliliter',
-  MeasureUnit.piece: 'Per piece'
-};
-
-class _ManageFoodState extends State<ManageFood> {
-  
   final _formKey = GlobalKey<FormState>();
-  
-  @override
-  void initState() {
-    super.initState();
-
-    final id = widget.foodId ?? "";
-    if (id.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((d) {
-        final model = context.read<ManageFoodViewmodel>();
-        model.initialLoading(id);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final mv = context.watch<ManageFoodViewmodel>();
 
-    var appBarTitle = "";
-    var initialData = mv.food; // if createMode entries will have zero values by default
-
+    // if createMode entries will have zero values by default...
+    var initialData =  mv.formImputs;
     Util.print.debug("Initial Data in viewModel is ${initialData.toString()}");
-
-    if (mv.createMode) {
-      appBarTitle = "Create Food";
-    } else {
-      appBarTitle = "Edit Food";
-    }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(appBarTitle),
+        title: Text((mv.createMode) ? "Create Food" : "Edit Food"),
       ),
       body: mv.isLoading
           ? Util.wCircularLoader
           : Padding(
-        padding:
-        const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
-            child: Form(
-              key: _formKey,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
+              child: Form(
+                key: _formKey,
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
@@ -71,14 +39,24 @@ class _ManageFoodState extends State<ManageFood> {
                         initialValue: initialData.name,
                         autocorrect: true,
                         enableSuggestions: true,
+                        onChanged: (name) {
+                          mv.formImputs.name = name;
+                        },
                         decoration: const InputDecoration(
                             labelText: "Food Name",
                             border: OutlineInputBorder(),
                             hintText: "Food..."),
                       ),
+                      const SizedBox(height: 20,),
                       DropdownButtonFormField(
+                        decoration: const InputDecoration(
+                          labelText: "Unit",
+                          border: OutlineInputBorder(),
+                        ),
                         value: initialData.unit,
-                        onChanged: (selectedUint) {},
+                        onChanged: (unit) {
+                          if (unit != null) mv.formImputs.unit = unit;
+                        },
                         items: MeasureUnit.values
                             .map(
                               (unit) => DropdownMenuItem(
@@ -87,32 +65,118 @@ class _ManageFoodState extends State<ManageFood> {
                               ),
                             )
                             .toList(),
+                      ),
+                      const Divider(height: 20,),
+                      _showMicrosInput(initialData,mv),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          FilledButton(
+                          onPressed:(){
+                            mv.saveFood(
+                              callback: ()=> Navigator.of(context).pop()
+                            );
+                          }, child: const Text("Save")),
+                        ],
                       )
                     ],
                   ),
                 ),
               ),
-          ),
+            ),
+    );
+  }
+
+  Widget _showMicrosInput(FormImputs initialData, ManageFoodViewmodel mv){
+    return Column(
+
+      children: [
+        Row(
+          children: [
+            // calories
+            Expanded(
+              child: TextFormField(
+                initialValue: initialData.macros.calories.toString(),
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  final safeValue = int.tryParse(val);
+                  if(safeValue!= null){
+                    mv.formImputs.macros.calories = safeValue;
+                  }
+                },
+                decoration: const InputDecoration(
+                    labelText: "Calories",
+                    border: OutlineInputBorder(),
+                    suffixText: "kcal"),
+              ),
+            ),
+            const SizedBox(width: 20,),
+            // protein
+            Expanded(
+              child: TextFormField(
+                initialValue: initialData.macros.protein.toString(),
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  final safeValue = double.tryParse(val);
+                  if(safeValue!= null){
+                    mv.formImputs.macros.protein = safeValue;
+                  }
+                },
+                decoration: const InputDecoration(
+                    labelText: "Protein",
+                    border: OutlineInputBorder(),
+                    suffixText: "grams"),
+              ),
+            ),
+        ]
+
+        ),
+        const SizedBox(height: 20,),
+        
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                initialValue: initialData.macros.fats.toString(),
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  final safeValue = double.tryParse(val);
+                  if(safeValue!= null){
+                    mv.formImputs.macros.fats = safeValue;
+                  }
+                },
+                decoration: const InputDecoration(
+                    labelText: "Fats",
+                    border: OutlineInputBorder(),
+                    suffixText: "grams"),
+              ),
+            ),
+            const SizedBox(width: 20,),
+            Expanded(
+              child: TextFormField(
+                initialValue: initialData.macros.carbs.toString(),
+                keyboardType: TextInputType.number,
+                onChanged: (val) {
+                  final safeValue = double.tryParse(val);
+                  if(safeValue!= null){
+                    mv.formImputs.macros.carbs = safeValue;
+                  }
+                },
+                decoration: const InputDecoration(
+                    labelText: "Carbohydrates",
+                    border: OutlineInputBorder(),
+                    suffixText: "grams"),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
 
-// Unit selection view
-// Expanded(
-//   child: DropdownButtonFormField(
-//     decoration: const InputDecoration(
-//       labelText: "Unit",
-//       border: OutlineInputBorder(),
-//     ),
-//     value: unit,
-//     items: MeasureUnit.values
-//         .map(
-//           (e) => DropdownMenuItem(
-//             value: e,
-//             child: Text(e.name),
-//           ),
-//         )
-//         .toList(),
-//     onChanged: (val) {},
-//   ),
-// )
+Map<MeasureUnit, String> _unitMap = {
+  MeasureUnit.gram: 'Per 100 gram',
+  MeasureUnit.milliliter: 'Per 100 milliliter',
+  MeasureUnit.piece: 'Per piece'
+};
