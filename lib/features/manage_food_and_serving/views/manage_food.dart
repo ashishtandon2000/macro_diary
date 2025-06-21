@@ -66,7 +66,7 @@ class ManageFood extends StatelessWidget {
                             )
                             .toList(),
                       ),
-                      const Divider(height: 20,),
+                      const Divider(height: 40,),
                       _showMicrosInput(initialData,mv),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,

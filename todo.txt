@@ -1,13 +1,15 @@
 
 Bugs:
 - summary values needs to be rounded to two decimal place
-
+- seeing prev state food manage even after clicking on the list tile again
 
 TODO:
 - Save functionality of food mgmt remains...
 - complete manage serving functionality
 - Setup repository
 - Improve UI
+- Add a bit of animations like hero widget etc
+- Add search option
 
 FUTURE Addition etc:
 - Remote storage of data

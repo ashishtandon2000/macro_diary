@@ -91,8 +91,7 @@ final List<FoodItem> testFoodItems = [
   ),
 ];
 
-
-class FoodRepositoryImpl    implements IFoodRepository    {
+class FoodRepositoryImpl implements IFoodRepository {
 
   @override
   Future<List<FoodItem>> getAll()async{
