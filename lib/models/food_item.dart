@@ -35,4 +35,8 @@ class FoodItem {
       unit: unit ?? this.unit,
     );
   }
+
+  factory FoodItem.fromJson(Map<String, dynamic> json){
+    return FoodItem();
+  }
 }

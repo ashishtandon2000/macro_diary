@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/food_serving.dart';
 
@@ -10,22 +11,30 @@ class Codec{
     return jsonEncode(obj);
   }
 
-  T? decode<T>(){
+  T? decode<T>(String data){
+
+    final Map<String, dynamic> json = jsonDecode(data);
+
     try{
       switch(T){
-        case FoodItem:
-
+        case const (FoodItem):
+          FoodItem foodItem = FoodItem.fromJson(json);
           break;
-          case FoodServing:
+          case const (FoodServing):
 
             break;
+        case const (Summary):
+
+          break;
+        default:
+          break;
 
       }
 
 
 
     }catch(e){
-
+        return null;
     }
 
 
@@ -33,6 +42,8 @@ class Codec{
   }
 
 }
+
+// TODO: CREATE fu
 
 /// Approach 1: ask for type while decoding...
 /// Approach 2: store type in json map like- {
