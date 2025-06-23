@@ -4,7 +4,10 @@ Bugs:
 - seeing prev state food manage even after clicking on the list tile again
 
 TODO:
-- Save functionality of food mgmt remains...
+- Update all the models and add toJson and fromJSon
+- Complete food item repo
+- Complete Codec class
+
 - complete manage serving functionality
 - Setup repository
 - Improve UI
