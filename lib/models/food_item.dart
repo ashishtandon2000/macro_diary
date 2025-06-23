@@ -36,7 +36,22 @@ class FoodItem {
     );
   }
 
-  factory FoodItem.fromJson(Map<String, dynamic> json){
-    return FoodItem();
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'macros': macros.toJson(),
+    'unit': unit.name, // since Dart >= 2.15, use `name` instead of string splitting
+  };
+
+  factory FoodItem.fromJson(Map<String, dynamic> json) {
+    return FoodItem(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      macros: Macros.fromJson(json['macros'] as Map<String, dynamic>),
+      unit: MeasureUnit.values.firstWhere(
+            (e) => e.toString().split('.').last == json['unit'],
+        orElse: () => MeasureUnit.gram, // fallback if invalid
+      ),
+    );
   }
 }

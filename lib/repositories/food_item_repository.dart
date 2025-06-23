@@ -1,6 +1,9 @@
 
+import 'package:macro_diary/features/home_screen/view/widgets/food_list_tile.dart';
 import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/repositories/db.dart';
+import 'package:macro_diary/repositories/repo_util.dart';
 
 abstract class IFoodRepository { // I is standard used for interfaces
 
@@ -93,23 +96,50 @@ final List<FoodItem> testFoodItems = [
 
 class FoodRepositoryImpl implements IFoodRepository {
 
+  final _uniqueKey = "food_items";
+  key(String id) => "${_uniqueKey}_$id";
+
   @override
   Future<List<FoodItem>> getAll()async{
-    return testFoodItems;
+    final data = DB().getAll(_uniqueKey);
+
+    final List<FoodItem> items = [];
+
+    for(var itemStr in data){
+      if(itemStr != null){
+        final item = Codec.decode<FoodItem>(itemStr);
+        if(item != null){
+          items.add(item);
+        }
+      }
+    }
+
+    return items;
+    // return testFoodItems;
   }
 
   @override
   Future<FoodItem?> get(String foodId)async{
-    for(var item in testFoodItems){
-      if(item.id == foodId){
-        return item;
-      }
+
+    final data = DB().instance.getString(key(foodId));
+    if(data != null){
+       return Codec.decode<FoodItem>(data);
     }
+
+
+    // for(var item in testFoodItems){
+    //   if(item.id == foodId){
+    //     return item;
+    //   }
+    // }
     return null;
   }
 
   @override
-  Future<void> create(FoodItem item)async{}
+  Future<bool> create(FoodItem item)async{
+    final data = Codec.encode(item);
+    return DB().instance.setString(key(item.id), data);
+  }
 
   @override
   Future<void> update(FoodItem item)async{}

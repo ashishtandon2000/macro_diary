@@ -7,11 +7,11 @@ import 'package:macro_diary/models/food_serving.dart';
 
 class Codec{
 
-  String encode(Object obj){
+  static String encode(Object obj){
     return jsonEncode(obj);
   }
 
-  T? decode<T>(String data){
+  static T? decode<T>(String data){
 
     final Map<String, dynamic> json = jsonDecode(data);
 
@@ -42,8 +42,6 @@ class Codec{
   }
 
 }
-
-// TODO: CREATE fu
 
 /// Approach 1: ask for type while decoding...
 /// Approach 2: store type in json map like- {

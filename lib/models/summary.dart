@@ -14,4 +14,20 @@ class Macros {
       required this.protein,
       required this.carbs,
       required this.fats});
+
+  Map<String, dynamic> toJson() => {
+    'protein': protein,
+    'carbs': carbs,
+    'fat': fats,
+    'calories': calories
+  };
+
+  factory Macros.fromJson(Map<String, dynamic> json) {
+    return Macros(
+      calories: json['calories']?? 0,
+      protein: json['protein'] ?? 0.0,
+      carbs: json['carbs'] ?? 0.0,
+      fats: json['fat'] ?? 0.0,
+    );
+  }
 }
