@@ -1,4 +1,4 @@
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 
 enum MeasureUnit { gram, milliliter, piece }
 

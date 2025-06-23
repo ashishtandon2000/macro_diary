@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_serving_viewmodel.dart';
 import 'package:macro_diary/models/food_item.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 import 'package:provider/provider.dart';
 
 class ManageServing extends StatefulWidget {

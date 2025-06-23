@@ -64,8 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   itemCount: model.foodServings.length,
                                   itemBuilder: (context, index) {
                                     final serving = model.foodServings[index];
-                                    final relativeFood =
-                                        model.getFoodById(serving.foodId);
+                                    final relativeFood = model.getFoodById(serving.foodId);
                                     return FoodListTile(
                                       serving: serving,
                                       foodItem: relativeFood!,

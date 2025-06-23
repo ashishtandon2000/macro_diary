@@ -1,10 +1,9 @@
 
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 
 abstract class ISummaryRepository {
 
   Future<Macros> getCurrentSummary();
-
 }
 
 class SummaryRepositoryImpl implements ISummaryRepository {

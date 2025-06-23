@@ -11,7 +11,7 @@ class Codec{
     return jsonEncode(obj);
   }
 
-  static T? decode<T>(String data){
+  static dynamic decode<T>(String data){
 
     final Map<String, dynamic> json = jsonDecode(data);
 
@@ -19,8 +19,9 @@ class Codec{
       switch(T){
         case const (FoodItem):
           FoodItem foodItem = FoodItem.fromJson(json);
-          break;
-          case const (FoodServing):
+          return foodItem;
+
+        case const (FoodServing):
 
             break;
         case const (Summary):

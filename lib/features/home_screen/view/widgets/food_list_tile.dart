@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_serving.dart';
 import 'package:macro_diary/models/food_item.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 
 class FoodListTile extends StatelessWidget{
   const FoodListTile({required this.foodItem, this.serving,super.key,required this.editFun, required this.addFun});

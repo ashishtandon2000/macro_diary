@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_item.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 import 'package:macro_diary/repositories/food_item_repository.dart';
 import 'package:uuid/uuid.dart';
 

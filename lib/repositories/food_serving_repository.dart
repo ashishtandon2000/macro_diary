@@ -1,82 +1,55 @@
 import 'package:macro_diary/models/food_serving.dart';
+import 'package:macro_diary/repositories/db.dart';
+import 'package:macro_diary/repositories/util.dart';
 
 abstract class IServingRepository {
   Future<FoodServing?> get(String servingId);
   Future<List<FoodServing>> getAll();
   Future<void> create(FoodServing serving);
-  Future<void> update(FoodServing serving);
   Future<void> delete(String servingId);
 }
-const testServing = FoodServing(
-  id: 'serv-apple-150g',
-  label: 'Apple (150 g)',
-  foodId: 'apple-100g',
-  servingSize: 150,
-);
 
-const List<FoodServing> testServings = [
-  FoodServing(
-    id: 'serv-apple-150g',
-    label: 'Apple (150 g)',
-    foodId: 'apple-100g',
-    servingSize: 150,
-  ),
-  FoodServing(
-    id: 'serv-banana-1',
-    label: 'Banana (1 medium)',
-    foodId: 'banana-piece',
-    servingSize: 1,
-  ),
-  FoodServing(
-    id: 'serv-rice-200g',
-    label: 'Cooked Rice (200 g)',
-    foodId: 'rice-100g',
-    servingSize: 200,
-  ),
-  FoodServing(
-    id: 'serv-chicken-1',
-    label: 'Chicken Breast (1 piece ~120 g)',
-    foodId: 'chicken-100g',
-    servingSize: 120,
-  ),
-  FoodServing(
-    id: 'serv-milk-250ml',
-    label: 'Milk (250 ml)',
-    foodId: 'milk-100ml',
-    servingSize: 250,
-  ),
-  FoodServing(
-    id: 'serv-bread-2',
-    label: 'Whole Wheat Bread (2 slices)',
-    foodId: 'bread-slice',
-    servingSize: 2,
-  ),
-  FoodServing(
-    id: 'serv-egg-2',
-    label: 'Eggs (2 large)',
-    foodId: 'egg-large',
-    servingSize: 2,
-  ),
-];
 
 class ServingRepositoryImpl implements IServingRepository{
 
-  @override
-  Future<FoodServing> get(String servingId) async {
-    return testServing;
-  }
+  final _uniqueKey = "food_serving";
+  key(String id) => "${_uniqueKey}_$id";
 
   @override
   Future<List<FoodServing>> getAll()async{
-    return testServings;
+    final data = DB().getAll(_uniqueKey);
+
+    final List<FoodServing> items = [];
+
+    for(var itemStr in data){
+      if(itemStr != null){
+        final item = Codec.decode<FoodServing>(itemStr);
+        if(item != null){
+          items.add(item);
+        }
+      }
+    }
+
+    return items;
   }
 
   @override
-  Future<void> create(FoodServing serving)async{}
+  Future<FoodServing?> get(String servingId) async {
+    final data = DB().instance.getString(key(servingId));
+    if(data != null){
+      return Codec.decode<FoodServing>(data);
+    }
+    return null;
+  }
 
   @override
-  Future<void> update(FoodServing serving)async{}
+  Future<bool> create(FoodServing serving)async{
+    final data = Codec.encode(serving);
+    return await DB().instance.setString(key(serving.id), data);
+  }
 
   @override
-  Future<void> delete(String servingId)async{}
+  Future<bool> delete(String servingId)async{
+    return await DB().instance.remove(key(servingId));
+  }
 }

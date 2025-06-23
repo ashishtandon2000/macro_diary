@@ -2,7 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/food_serving.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 import 'package:macro_diary/repositories/food_serving_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -72,11 +72,7 @@ class ManageServingViewmodel extends ChangeNotifier {
     final id = item.id.isEmpty ? const Uuid().v4() : item.id;
     final toSave = item.copyWith(id: id);
 
-    if (await _repo.get(id) == null) {
-      await _repo.create(toSave);
-    } else {
-      await _repo.update(toSave);
-    }
+    _repo.create(toSave);
 
     _isLoading = false;
     notifyListeners();

@@ -1,12 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-
-// abstract class IDB{
-//   Future<bool> init();
-//   get(String key); // currently get does not require awaiting
-//   set(String key, Object value);
-// }
-
 class DB {
   DB._();
   static final _pvt = DB._();

@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 
 class SummaryView extends StatelessWidget {
   const SummaryView({super.key, required Macros sum}): _sum = sum;

@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:macro_diary/features/home_screen/view/home_screen.dart';
 import 'package:macro_diary/features/home_screen/view_model/home_screen_viewmodel.dart';
-import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_food_viewmodel.dart';
 import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_serving_viewmodel.dart';
+import 'package:macro_diary/repositories/db.dart';
 import 'package:macro_diary/repositories/food_item_repository.dart';
 import 'package:macro_diary/repositories/food_serving_repository.dart';
-import 'package:macro_diary/repositories/repo_util.dart';
 import 'package:macro_diary/repositories/summary_repository.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await DB().init();
+
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<HomeScreenViewmodel>(

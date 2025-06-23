@@ -1,5 +1,5 @@
 import 'package:macro_diary/models/food_item.dart';
-import 'package:macro_diary/models/summary.dart';
+import 'package:macro_diary/models/macros.dart';
 
 class FoodServing {
   final String id;
