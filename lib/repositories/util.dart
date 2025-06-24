@@ -1,9 +1,9 @@
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/food_serving.dart';
+import 'package:macro_diary/models/macros.dart';
 
 class Codec{
 
@@ -22,24 +22,19 @@ class Codec{
           return foodItem;
 
         case const (FoodServing):
+          FoodServing foodServing = FoodServing.fromJson(json);
+          return foodServing;
 
-            break;
-        case const (Summary):
+        case const (Macros):
+          Macros macros = Macros.fromJson(json);
+          return macros;
 
-          break;
         default:
-          break;
-
+          throw("type $T is not supported by Codec.decoder ");
       }
-
-
-
     }catch(e){
-        return null;
+        throw("Codec.decoder error: $e");
     }
-
-
-    return null;
   }
 
 }
