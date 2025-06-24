@@ -1,3 +1,4 @@
+import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/macros.dart';
 
@@ -26,6 +27,22 @@ class FoodServing {
       label: label ?? this.label,
       foodId: foodId ?? this.foodId,
       servingSize: servingSize ?? this.servingSize,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'label': label,
+    'foodId': foodId,
+    'servingSize': servingSize,
+  };
+
+  factory FoodServing.fromJson(Map<String, dynamic> json){
+    return FoodServing(
+        id: Util.fGetMapSafely<String>(data: json,key: "id"),
+        label: Util.fGetMapSafely<String>(data: json,key: "label"),
+        foodId: Util.fGetMapSafely<String>(data: json,key: "foodId"),
+        servingSize: Util.fGetMapSafely<int>(data: json, key: "servingSize")
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/macros.dart';
 
 enum MeasureUnit { gram, milliliter, piece }
@@ -45,11 +46,11 @@ class FoodItem {
 
   factory FoodItem.fromJson(Map<String, dynamic> json) {
     return FoodItem(
-      id: json['id'] as String,
-      name: json['name'] as String,
+      id: Util.fGetMapSafely<String>(data: json,key: "id"),
+      name: Util.fGetMapSafely<String>(data: json,key: "name"),
       macros: Macros.fromJson(json['macros'] as Map<String, dynamic>),
       unit: MeasureUnit.values.firstWhere(
-            (e) => e.toString().split('.').last == json['unit'],
+            (e) => e.name == json['unit'],
         orElse: () => MeasureUnit.gram, // fallback if invalid
       ),
     );
