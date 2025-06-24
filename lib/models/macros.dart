@@ -25,8 +25,9 @@ class Macros {
   };
 
   factory Macros.fromJson(Map<String, dynamic> json) {
+    Util.print.debug("json is $json");
     return Macros(
-      calories: Util.fGetMapSafely<int>(data: json,key: "id"),
+      calories: Util.fGetMapSafely<int>(data: json,key: "calories"),
       protein: Util.fGetMapSafely<double>(data: json,key: "protein"),
       carbs: Util.fGetMapSafely<double>(data: json,key: "carbs"),
       fats: Util.fGetMapSafely<double>(data: json,key: "fats"),
