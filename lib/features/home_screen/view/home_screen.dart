@@ -77,10 +77,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         model.updateUsingFoodServing(serving);
                                       },
                                       editFun: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ManageServing()));
+                                        _navigateToManageServing(
+                                          foods: model.foodItems,
+                                          id: serving.id,
+                                          relativeFood: relativeFood
+                                        );
                                       },
                                     );
                                   }),

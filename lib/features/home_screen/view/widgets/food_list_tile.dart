@@ -30,6 +30,8 @@ class FoodListTile extends StatelessWidget{
         }
       }catch(e){
         Util.print.error("FoodListTile >> failed to load detail with error:  $e");
+      }finally{
+        Util.print.debug("#ONETIME macros for $title: $macros");
       }
 
 
