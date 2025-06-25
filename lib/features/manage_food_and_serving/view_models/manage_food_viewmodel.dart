@@ -6,6 +6,8 @@ import 'package:macro_diary/models/macros.dart';
 import 'package:macro_diary/repositories/food_item_repository.dart';
 import 'package:uuid/uuid.dart';
 
+const uuid = Uuid();
+
 class FormImputs {
 
   String name = "";
@@ -32,7 +34,7 @@ class ManageFoodViewmodel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  FoodItem _food = FoodItem(id: "", name: "", macros: Macros(protein: 0, carbs: 0, fats: 0, calories: 0), unit: MeasureUnit.gram);
+  FoodItem _food = FoodItem(id: uuid.v4().toString(), name: "", macros: Macros(protein: 0, carbs: 0, fats: 0, calories: 0), unit: MeasureUnit.gram);
   FoodItem get food => _food;
 
    // Load Food item if editing
@@ -48,6 +50,8 @@ class ManageFoodViewmodel extends ChangeNotifier {
           _createMode = true;
           return;
         }else{
+          Util.print.debug("Initial Data in viewModel is ${_food.toString()}");
+
           _createMode = false;
           _food = tempFood;
 
@@ -72,6 +76,16 @@ class ManageFoodViewmodel extends ChangeNotifier {
 
     try{
       Util.print.debug("Info for saving food is: ${formImputs.toString()}");
+
+      final foodItem = FoodItem(
+        name: formImputs.name,
+        unit: formImputs.unit,
+        macros: formImputs.macros,
+        id: _food.id,
+      );
+
+      _repo.create(foodItem);
+
     }catch(e){
       Util.print.error("Failed to save food Item");
     }finally{
@@ -79,15 +93,6 @@ class ManageFoodViewmodel extends ChangeNotifier {
       notifyListeners();
       callback?.call(); // call the callback if any
     }
-
-    // final id = item.id.isEmpty ? const Uuid().v4() : item.id;
-    // final toSave = item.copyWith(id: id);
-    //
-    // if (await _repo.get(id) == null) {
-    //   await _repo.create(toSave);
-    // } else {
-    //   await _repo.update(toSave);
-    // }
   }
 
 }

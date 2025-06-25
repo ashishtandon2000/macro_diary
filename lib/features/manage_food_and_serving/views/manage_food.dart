@@ -4,12 +4,11 @@ import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_
 import 'package:macro_diary/models/food_item.dart';
 import 'package:provider/provider.dart';
 
+
+/// Can convert it into stateful with that constructor can be made const as currently due to _formKey it can not be declared const
 class ManageFood extends StatelessWidget {
   /// Create or edit food entry
-  ManageFood({super.key, this.foodId});
-
-  /// In case of editing existing entry foodId will be passed, and in case of new entry foodId will be null
-  final String? foodId;
+  ManageFood({super.key});
 
   final _formKey = GlobalKey<FormState>();
 
@@ -19,7 +18,6 @@ class ManageFood extends StatelessWidget {
 
     // if createMode entries will have zero values by default...
     var initialData =  mv.formImputs;
-    Util.print.debug("Initial Data in viewModel is ${initialData.toString()}");
 
     return Scaffold(
       appBar: AppBar(
