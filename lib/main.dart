@@ -14,7 +14,6 @@ void main() async {
 
   await DB().init();
 
-
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<HomeScreenViewmodel>(
@@ -24,11 +23,6 @@ void main() async {
           summaryRepo: SummaryRepositoryImpl(),
         ),
       ),
-      ChangeNotifierProvider<ManageServingViewmodel>(
-        create: (_) => ManageServingViewmodel(
-          repo: ServingRepositoryImpl(),
-        ),
-      )
     ],
     child: const MyApp(),
   ));
