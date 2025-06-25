@@ -37,8 +37,8 @@ class FoodListTile extends StatelessWidget{
       leading: Icon((serving != null)?Icons.dinner_dining:Icons.fastfood),
       title: Text(title),
       subtitle: Text("Calories: ${macros.calories} | Protein: ${macros.protein} | Fats: ${macros.fats} | Carbs: ${macros.carbs}"),
-      onTap: editFun,
-      trailing: IconButton(onPressed: addFun, icon: const Icon(Icons.add)),
+      onTap: addFun,
+      trailing: IconButton(onPressed: editFun, icon: const Icon(Icons.edit)),
       // isThreeLine: true,
     );
   }

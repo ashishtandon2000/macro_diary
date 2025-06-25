@@ -4,9 +4,12 @@ import 'package:macro_diary/features/home_screen/view/widgets/food_list_tile.dar
 import 'package:macro_diary/features/home_screen/view/widgets/summary.dart';
 import 'package:macro_diary/features/home_screen/view_model/home_screen_viewmodel.dart';
 import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_food_viewmodel.dart';
+import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_serving_viewmodel.dart';
 import 'package:macro_diary/features/manage_food_and_serving/views/manage_food.dart';
 import 'package:macro_diary/features/manage_food_and_serving/views/manage_serving.dart';
+import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/repositories/food_item_repository.dart';
+import 'package:macro_diary/repositories/food_serving_repository.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -47,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(
                   height: 20,
                 ),
+                _optionsRow(),
                 Expanded(
                   child: DefaultTabController(
                       length: 2,
@@ -64,7 +68,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   itemCount: model.foodServings.length,
                                   itemBuilder: (context, index) {
                                     final serving = model.foodServings[index];
-                                    final relativeFood = model.getFoodById(serving.foodId);
+                                    final relativeFood =
+                                        model.getFoodById(serving.foodId);
                                     return FoodListTile(
                                       serving: serving,
                                       foodItem: relativeFood!,
@@ -75,12 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    ManageServing(
-                                                      servingId: serving.id,
-                                                      relativeFood:
-                                                          relativeFood,
-                                                      foods: model.foodItems,
-                                                    )));
+                                                    ManageServing()));
                                       },
                                     );
                                   }),
@@ -108,18 +108,66 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  _navigateToManageFood(id) { // #TODO: make manage food stateless and call the inital loading right here
-    Navigator.of(context).push(
+  Widget _optionsRow() {
+    final foods = context.read<HomeScreenViewmodel>().foodItems;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        ElevatedButton.icon(
+          onPressed: (){
+            _navigateToManageServing(foods: foods);
+          },
+          label: const Text("Serving"),
+          icon: const Icon(Icons.add, size: 20),
+        ),
+        ElevatedButton.icon(
+          onPressed: _navigateToManageFood,
+          label: const Text("Food"),
+          icon: const Icon(
+            Icons.add,
+            size: 20,
+          ),
+        ),
+      ],
+    );
+  }
+
+  _refreshScreen() {
+    context.read<HomeScreenViewmodel>().loadContent();
+  }
+
+  _navigateToManageFood([String? id]) {
+    Navigator.of(context)
+        .push(
       MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
           create: (_) => ManageFoodViewmodel(
             repo: FoodRepositoryImpl(),
           )..initialLoading(id),
-          child: ManageFood(
-            foodId: id,
-          ),
+          child: ManageFood(),
         ),
       ),
-    );
+    )
+        .then((_) {
+      _refreshScreen();
+    });
+  }
+
+  _navigateToManageServing(
+      {String? id, FoodItem? relativeFood,required List<FoodItem> foods}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (_) => ManageServingViewmodel(
+            repo: ServingRepositoryImpl(),
+          )..initialLoading(id, relativeFood, foods),
+          child: ManageServing(),
+        ),
+      ),
+    )
+        .then((_) {
+      _refreshScreen();
+    });
   }
 }
