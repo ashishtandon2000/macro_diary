@@ -85,7 +85,7 @@ class ManageFood extends StatelessWidget {
     );
   }
 
-  Widget _showMicrosInput(FormImputs initialData, ManageFoodViewmodel mv){
+  Widget _showMicrosInput(FoodFormImputs initialData, ManageFoodViewmodel mv){
     return Column(
 
       children: [

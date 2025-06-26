@@ -1,3 +1,4 @@
+import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_serving.dart';
 import 'package:macro_diary/repositories/db.dart';
 import 'package:macro_diary/repositories/util.dart';
@@ -29,6 +30,10 @@ class ServingRepositoryImpl implements IServingRepository{
         }
       }
     }
+    // #DEBUG #ONETIME
+    print("");
+    items.forEach((item)=>Util.print.debug("#ONETIME Food servings from repo are: ${item.toString()}"));
+    print("");
 
     return items;
   }

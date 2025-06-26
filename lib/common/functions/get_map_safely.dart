@@ -4,6 +4,7 @@ dynamic getMapSafely<valueType>({required Map data, required String key}) {
     valueType val = data[key] as valueType;
     return val;
   } catch (err) {
+    print("#DEBUG #ONETIME : not working with type $valueType with err $err");
     switch (valueType) {
       case String:
         return "";

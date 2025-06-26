@@ -1,5 +1,5 @@
+import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_item.dart';
-import 'package:macro_diary/models/macros.dart';
 import 'package:macro_diary/repositories/db.dart';
 import 'package:macro_diary/repositories/util.dart';
 
@@ -30,6 +30,12 @@ class FoodRepositoryImpl implements IFoodRepository {
         }
       }
     }
+
+    // #DEBUG #ONETIME
+    print("");
+    items.forEach((item)=>Util.print.debug("#ONETIME Food items from repo are: ${item.toString()}"));
+    print("");
+
 
     return items;
   }

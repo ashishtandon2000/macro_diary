@@ -8,7 +8,7 @@ import 'package:uuid/uuid.dart';
 
 const uuid = Uuid();
 
-class FormImputs {
+class FoodFormImputs {
 
   String name = "";
   MeasureUnit unit = MeasureUnit.gram;
@@ -26,7 +26,7 @@ class ManageFoodViewmodel extends ChangeNotifier {
   ManageFoodViewmodel({ required IFoodRepository repo }) : _repo = repo;
 
   // Manage form
-  final FormImputs formImputs = FormImputs();
+  final FoodFormImputs formImputs = FoodFormImputs();
 
   bool _createMode = true; // false if editing food
   bool get createMode => _createMode;
@@ -50,7 +50,7 @@ class ManageFoodViewmodel extends ChangeNotifier {
           _createMode = true;
           return;
         }else{
-          Util.print.debug("Initial Data in viewModel is ${_food.toString()}");
+          Util.print.debug("Initial Data in food viewModel is ${_food.toString()}");
 
           _createMode = false;
           _food = tempFood;
@@ -65,8 +65,6 @@ class ManageFoodViewmodel extends ChangeNotifier {
        _isLoading = false;
        notifyListeners();
      }
-
-
    }
 
   /// 2. Save – create or update based on presence of an ID

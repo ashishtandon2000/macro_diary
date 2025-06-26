@@ -5,56 +5,24 @@ import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/macros.dart';
 import 'package:provider/provider.dart';
 
-class ManageServing extends StatefulWidget {
-  const ManageServing({super.key, this.servingId,this.relativeFood, this.foods = const []});
+class ManageServing extends StatelessWidget {
+  ManageServing({super.key});
 
-  final String? servingId;
-  final FoodItem? relativeFood;
-  final List<FoodItem> foods;
-
-  @override
-  State<ManageServing> createState() => _ManageServingState();
-}
-
-class _ManageServingState extends State<ManageServing> {
   final _formKey = GlobalKey<FormState>();
 
   @override
-  void initState() {
-    super.initState();
-
-    /// Editing existing serve if serveId exists
-    final serveId = widget.servingId ?? "";
-    if (serveId.isNotEmpty && widget.relativeFood != null) {
-      WidgetsBinding.instance.addPostFrameCallback((d) {
-        final model = context.read<ManageServingViewmodel>();
-        model.loadServing(serveId,widget.relativeFood!);
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final model = context.watch<ManageServingViewmodel>();
+    final mv = context.watch<ManageServingViewmodel>();
 
-    String title = "";
-    String servingSize = "100";
-    MeasureUnit unit = MeasureUnit.gram;
+    var initialData =  mv.formImputs;
 
 
-    if(model.serving != null){
-      title = model.serving!.label;
-      servingSize = model.serving!.servingSize.toString();
-      unit = model.relativeFood?.unit ?? MeasureUnit.gram;
-    }
-
-    Util.print.debug(" Serving Details are as follow : $title $servingSize $unit");
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Macro Diary"),
       ),
-      body: model.isLoading
+      body: mv.isLoading
           ? Util.wCircularLoader
           : Padding(
               padding:
@@ -68,12 +36,15 @@ class _ManageServingState extends State<ManageServing> {
                       TextFormField(
                         autocorrect: true,
                         enableSuggestions: true,
-                        initialValue: title,
+                        initialValue: initialData.title,
                         decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: "Serving Title",
                             hintText: "Serving....",
                             prefixIcon: Icon(Icons.dinner_dining)),
+                          onChanged: (t) {
+                            initialData.title = t;
+                          }
                       ),
                       const SizedBox(
                         height: 12,
@@ -82,14 +53,20 @@ class _ManageServingState extends State<ManageServing> {
                         keyboardType: TextInputType.number,
                         autocorrect: true,
                         enableSuggestions: true,
-                        initialValue: servingSize,
+                        initialValue: initialData.servingSize.toString(),
                         decoration:  InputDecoration(
                             border: const OutlineInputBorder(),
                             labelText: "Serving Size",
                             hintText: "Amount....",
                             prefixIcon: const Icon(Icons.dinner_dining),
-                            suffixText: unit.name
+                            suffixText: mv.formImputs.relativeFood.unit.name,
                         ),
+                        onChanged: (amount){
+                          final safeValue = int.tryParse(amount);
+                          if(safeValue!= null){
+                            mv.formImputs.servingSize = safeValue;
+                          }
+                        },
                       ),
                       // _showEstimatedMacros(model.getEstimatedMacros(100, model.relativeFood)), // #TODO: get estimated macros from the form
                       const SizedBox(
@@ -98,13 +75,16 @@ class _ManageServingState extends State<ManageServing> {
                       const Divider(
                         height: 30,
                       ),
-                      (widget.relativeFood != null)?
-                      _showRelativeFood(widget.relativeFood!)
-                          : _showFoodSelectionMenu(),
+                      (mv.createMode)?
+                          _showFoodSelectionMenu(context):
+                      _showRelativeFood(mv.formImputs.relativeFood),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          FilledButton(onPressed: (){}, child: const Text("Save")),
+                          FilledButton(onPressed: (){
+                            mv.saveServing(callback: ()=>Navigator.of(context).pop()
+                            );
+                          }, child: const Text("Save")),
                         ],
                       )
                     ],
@@ -132,7 +112,7 @@ class _ManageServingState extends State<ManageServing> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Standard Serving:",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
+        const Text("Serving of:",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
         ListTile(
           title: Text(food.name),
           subtitle: Text("Calories: ${food.macros.calories} | Protein: ${food.macros.protein} | Fats: ${food.macros.fats} | Carbs: ${food.macros.carbs}"),
@@ -142,17 +122,23 @@ class _ManageServingState extends State<ManageServing> {
     );
   }
 
-  Widget _showFoodSelectionMenu(){
+  Widget _showFoodSelectionMenu(BuildContext ctx){
+    final mv = ctx.read<ManageServingViewmodel>();
+
     return DropdownButtonFormField(
       decoration: const InputDecoration(
           label: Text("Serving of: ")
       ),
-      items: widget.foods.map((e) =>DropdownMenuItem(
+      items: mv.foods.map((e) =>DropdownMenuItem(
         value: e,
         child: Text(e.name),
       )
       ).toList(),
-      onChanged: (val){},
+      onChanged: (food){
+        if(food != null){
+          mv.updateSelectedFood(food);
+        }
+      },
     );
   }
 }

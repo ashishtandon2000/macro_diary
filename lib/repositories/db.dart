@@ -9,6 +9,9 @@ class DB {
 
   Future<bool> init()async{
     _dbInstance = await SharedPreferences.getInstance();
+
+    // _dbInstance?.clear();
+
     return true;
   }
 

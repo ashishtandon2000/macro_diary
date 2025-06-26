@@ -1,18 +1,21 @@
 
 Bugs:
 - summary values needs to be rounded to two decimal place
-- seeing prev state food manage even after clicking on the list tile again
 
 TODO:
+- Setup and resolve issues for serving mgmt setup
+    1. Editing not working.
 - add null screen message
-- Implement food and servings functionality with actual repo
+- multiple select for delete.
+- add micros estimate.
 
 - Improve UI
 - Add a bit of animations like hero widget etc
-- Add search option
+- Add search option.
+- Preserve/share/import/export data
 
 FUTURE Addition etc:
 - Remote storage of data
-- add commonly used food items to autofilling
+- add commonly used food items to auto filling
 - add features like BMR and and required kcal calculation etc
 - make the data set useful
