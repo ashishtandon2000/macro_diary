@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/cupertino.dart';
 import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/models/food_serving.dart';
@@ -7,6 +9,8 @@ import 'package:macro_diary/repositories/food_item_repository.dart';
 import 'package:macro_diary/repositories/food_serving_repository.dart';
 import 'package:macro_diary/repositories/summary_repository.dart';
 
+
+Queue<Macros> macrosHistory = Queue<Macros>();
 
 class HomeScreenViewmodel extends ChangeNotifier{
   HomeScreenViewmodel({
@@ -33,7 +37,6 @@ class HomeScreenViewmodel extends ChangeNotifier{
   );
   Macros get sum => _sum;
 
-
   // Food Items & Servings
   final Map<String, FoodItem> _foodMap = {};
   FoodItem? getFoodById(String id)=>_foodMap[id];
@@ -42,10 +45,25 @@ class HomeScreenViewmodel extends ChangeNotifier{
   List<FoodServing> _foodServings = [];
   List<FoodServing> get foodServings => _foodServings;
 
+
+
   // Methods....
   void _updateSummary(Macros macros){
     _sum.add(macros);
     _summaryRep.overrideSummary(_sum);
+    macrosHistory.add(macros);
+  }
+
+  void revertLast(){
+    _sum.subtract(macrosHistory.removeLast());
+    _summaryRep.overrideSummary(_sum);
+    notifyListeners();
+  }
+
+  void resetSummary(){
+    _sum.reset();
+    _summaryRep.overrideSummary(_sum);
+    notifyListeners();
   }
 
   void updateUsingFoodItem(FoodItem foodItem){

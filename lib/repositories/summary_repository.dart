@@ -6,7 +6,7 @@ import 'package:macro_diary/repositories/util.dart';
 abstract class ISummaryRepository {
 
   Macros getCurrentSummary();
-  Future<bool> addToSummary(Macros macros); // adds to existing summary
+  // Future<bool> addToSummary(Macros macros); // adds to existing summary
   Future<bool> overrideSummary(Macros macros); // overrides summary with new macros
 }
 
@@ -39,17 +39,17 @@ class SummaryRepositoryImpl implements ISummaryRepository {
     );
   }
 
-  @override
-  Future<bool> addToSummary(Macros macros) async {
-    final todayKey = key(_getDailyKey());
-
-    final currentSummary = getCurrentSummary();
-    currentSummary.add(macros);
-
-    final json = Codec.encode(currentSummary);
-
-    return await DB().instance.setString(todayKey, json);
-  }
+  // @override
+  // Future<bool> addToSummary(Macros macros) async {
+  //   final todayKey = key(_getDailyKey());
+  //
+  //   final currentSummary = getCurrentSummary();
+  //   currentSummary.add(macros);
+  //
+  //   final json = Codec.encode(currentSummary);
+  //
+  //   return await DB().instance.setString(todayKey, json);
+  // }
 
   @override
   Future<bool> overrideSummary(Macros macros) async {

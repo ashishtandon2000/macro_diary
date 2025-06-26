@@ -38,12 +38,25 @@ class Macros {
     );
   }
 
-  Macros add(Macros other){
+  void add(Macros other){
     calories += other.calories;
     protein = _roundAsDouble(other.protein+protein);
     carbs =  _roundAsDouble(other.carbs+carbs);
     fats =  _roundAsDouble(other.fats+fats);
-    return this;
+  }
+
+  void subtract(Macros other){
+    calories -= other.calories;
+    protein = _roundAsDouble(protein-other.protein);
+    carbs =  _roundAsDouble(carbs-other.carbs);
+    fats =  _roundAsDouble(fats-other.fats);
+  }
+
+  void reset(){
+    calories = 0;
+    protein = 0;
+    carbs = 0;
+    fats = 0;
   }
 
   double _roundAsDouble(double value){

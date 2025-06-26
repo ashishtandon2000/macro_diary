@@ -37,6 +37,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Macro Diary"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              model.revertLast();
+            },
+            icon: const Icon(Icons.undo),),
+          IconButton(onPressed: ()async{
+            final confirmed = await Util.wConfirmationDialog(context,title: "Confirm",msg: "Are you sure, you want to reset the summary?");
+
+            Util.print.debug("#ONETIME ---- confirmed is $confirmed");
+
+            if(confirmed==true){
+              model.resetSummary();
+            }
+          }, icon: const Icon(Icons.refresh))
+        ],
       ),
       body: model.isLoading
           ? Util.wCircularLoader
