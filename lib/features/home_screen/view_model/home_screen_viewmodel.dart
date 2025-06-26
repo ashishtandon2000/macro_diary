@@ -44,10 +44,8 @@ class HomeScreenViewmodel extends ChangeNotifier{
 
   // Methods....
   void _updateSummary(Macros macros){
-    _sum.calories += macros.calories;
-    _sum.protein += macros.protein;
-    _sum.carbs += macros.carbs;
-    _sum.fats += macros.fats;
+    _sum.add(macros);
+    _summaryRep.overrideSummary(_sum);
   }
 
   void updateUsingFoodItem(FoodItem foodItem){
@@ -84,7 +82,7 @@ class HomeScreenViewmodel extends ChangeNotifier{
    }
 
    // Get Summary
-   final pastSummary = await _summaryRep.getCurrentSummary();
+   final pastSummary =  _summaryRep.getCurrentSummary();
     _updateSummary(pastSummary);
 
     Util.print.debug("completed loading content ====${_foodItems.length} ${_foodServings.length} ");
