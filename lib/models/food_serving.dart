@@ -57,16 +57,12 @@ class FoodServing {
     double perUnitRatio = _unitRatio(food.unit);
     return Macros(
       calories: (food.macros.calories.toDouble() * perUnitRatio * servingSize.toDouble()).toInt(),
-      carbs: _roundOff(food.macros.carbs * perUnitRatio * servingSize.toDouble()),
-      protein: _roundOff(food.macros.protein * perUnitRatio * servingSize.toDouble()),
-      fats: _roundOff(food.macros.fats * perUnitRatio * servingSize.toDouble()),
+      carbs: food.macros.carbs * perUnitRatio * servingSize.toDouble(),
+      protein: food.macros.protein * perUnitRatio * servingSize.toDouble(),
+      fats: food.macros.fats * perUnitRatio * servingSize.toDouble(),
     );
   }
 
-  double _roundOff(double value){
-    double rounded = double.parse(value.toStringAsFixed(2));
-    return rounded;
-  }
 
   double _unitRatio(MeasureUnit unit) {
     switch (unit) {

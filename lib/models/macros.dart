@@ -6,16 +6,20 @@ class Macros {
   double carbs = 0;
   double fats = 0;
 
+  Macros({required this.calories,
+      required double protein,
+      required double carbs,
+      required double fats}){
+
+    this.protein = _roundAsDouble(protein);
+    this.carbs = _roundAsDouble(carbs);
+    this.fats = _roundAsDouble(fats);
+  }
+
   @override
   String toString(){
     return 'Macros(calories: $calories, protein: $protein, carbs: $carbs, fats: $fats)';
   }
-
-  Macros(
-      {required this.calories,
-      required this.protein,
-      required this.carbs,
-      required this.fats});
 
   Map<String, dynamic> toJson() => {
     'protein': protein,
@@ -32,5 +36,18 @@ class Macros {
       carbs: Util.fGetMapSafely<double>(data: json,key: "carbs"),
       fats: Util.fGetMapSafely<double>(data: json,key: "fats"),
     );
+  }
+
+  Macros add(Macros other){
+    calories += other.calories;
+    protein = _roundAsDouble(other.protein+protein);
+    carbs =  _roundAsDouble(other.carbs+carbs);
+    fats =  _roundAsDouble(other.fats+fats);
+    return this;
+  }
+
+  double _roundAsDouble(double value){
+    double rounded = double.parse(value.toStringAsFixed(2));
+    return rounded;
   }
 }
