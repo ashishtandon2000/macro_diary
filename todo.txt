@@ -3,11 +3,13 @@ Bugs:
 - summary values needs to be rounded to two decimal place
 
 TODO:
-- Setup and resolve issues for serving mgmt setup
-    1. Editing not working.
+- Handel exceptions
 - add null screen message
 - multiple select for delete.
-- add micros estimate.
+- add micros estimate fo serving mgmt.
+- Onetime meal
+- Add meals (combination of multiple food items or serving makes one meal )
+- Instead of just showing the summary total - show whole intake
 
 - Improve UI
 - Add a bit of animations like hero widget etc
