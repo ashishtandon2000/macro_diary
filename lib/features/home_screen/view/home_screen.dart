@@ -79,8 +79,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           Expanded(
-                            child: TabBarView(children: [
-                              ListView.builder(
+                            child: TabBarView(
+                                children: [
+                                  (model.foodServings.isEmpty)?
+                                  Util.wNullScreenMessage("No food serving added yet.")
+                                      :ListView.builder(
                                   itemCount: model.foodServings.length,
                                   itemBuilder: (context, index) {
                                     final serving = model.foodServings[index];
@@ -101,7 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                     );
                                   }),
-                              ListView.builder(
+                                  (model.foodItems.isEmpty)?
+                                  Util.wNullScreenMessage("No food item added yet."):ListView.builder(
                                   itemCount: model.foodItems.length,
                                   itemBuilder: (context, index) {
                                     final foodItem = model.foodItems[index];

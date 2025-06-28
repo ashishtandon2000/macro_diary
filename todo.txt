@@ -3,7 +3,7 @@ Bugs:
 - summary values needs to be rounded to two decimal place
 
 TODO:
-- Handel exceptions
+- Handel exception
 - add null screen message
 - multiple select for delete.
 - add micros estimate fo serving mgmt.
