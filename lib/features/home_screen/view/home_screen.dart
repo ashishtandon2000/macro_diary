@@ -94,6 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       foodItem: relativeFood!,
                                       addFun: () {
                                         model.updateUsingFoodServing(serving);
+                                        Util.wBottomNotifyMsg(
+                                          context: context,
+                                          message: "Added ${serving.label}"
+                                        );
                                       },
                                       editFun: () {
                                         _navigateToManageServing(
@@ -113,6 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                       foodItem: foodItem,
                                       addFun: () {
                                         model.updateUsingFoodItem(foodItem);
+                                        Util.wBottomNotifyMsg(
+                                            context: context,
+                                            message: "Added ${foodItem.name}"
+                                        );
                                       },
                                       editFun: () {
                                         _navigateToManageFood(foodItem.id);
