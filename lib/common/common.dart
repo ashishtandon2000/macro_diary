@@ -23,4 +23,5 @@ class Util {
   static const wCircularLoader = _circularLoader;
   static const wConfirmationDialog = _confirmationDialog; // Although it is a func but returns a widget and will be used like a widget
   static const wNullScreenMessage = _nullScreenMessage;
+  static const wBottomNotifyMsg = _bottomNotifier;
 }

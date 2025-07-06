@@ -16,3 +16,20 @@ Future<bool?> _confirmationDialog(BuildContext context,
       )
   );
 }
+
+void _bottomNotifier(
+    {required BuildContext context,required String message, VoidCallback? undo}){
+
+  ScaffoldMessenger.of(context).removeCurrentSnackBar();
+
+   ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content: Text(message),
+
+      // duration: const Duration(seconds: 3),
+      action: undo != null
+          ? SnackBarAction(label: "UNDO", onPressed: undo)
+          : null
+    ),);
+}
