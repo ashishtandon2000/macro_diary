@@ -8,7 +8,7 @@ abstract class IFoodRepository { // I is standard used for interfaces
   Future<List<FoodItem>> getAll();
   Future<FoodItem?> get(String foodId);
   Future<void> create(FoodItem item);
-  Future<void> delete(String foodId);
+  Future<bool> delete(String foodId);
 }
 
 class FoodRepositoryImpl implements IFoodRepository {

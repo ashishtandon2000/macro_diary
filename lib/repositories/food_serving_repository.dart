@@ -7,7 +7,7 @@ abstract class IServingRepository {
   Future<FoodServing?> get(String servingId);
   Future<List<FoodServing>> getAll();
   Future<void> create(FoodServing serving);
-  Future<void> delete(String servingId);
+  Future<bool> delete(String servingId);
 }
 
 

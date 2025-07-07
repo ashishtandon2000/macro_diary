@@ -7,12 +7,13 @@ import 'package:macro_diary/models/food_item.dart';
 import 'package:macro_diary/models/macros.dart';
 
 class FoodListTile extends StatelessWidget{
-  const FoodListTile({required this.foodItem, this.serving,super.key,required this.editFun, required this.addFun});
+  const FoodListTile({required this.foodItem, this.serving,super.key,required this.editFun, required this.addFun, required this.deleteFun});
 
   final FoodItem foodItem;
   final FoodServing? serving;
   final Function() editFun;
   final Function() addFun;
+  final Function() deleteFun;
 
   @override
   Widget build(BuildContext context){
@@ -40,7 +41,26 @@ class FoodListTile extends StatelessWidget{
       title: Text(title),
       subtitle: Text("Calories: ${macros.calories} | Protein: ${macros.protein} | Fats: ${macros.fats} | Carbs: ${macros.carbs}"),
       onTap: addFun,
-      trailing: IconButton(onPressed: editFun, icon: const Icon(Icons.edit)),
+      trailing: PopupMenuButton<String>(
+        onSelected: (value)async{
+      if (value == 'edit') {
+        editFun();
+      } else if (value == 'delete') {
+        final confirmed = await Util.wConfirmationDialog(
+          context,
+         title: "Delete Item",
+          msg: "Are you sure you want to delete this item?"
+        );
+        if(confirmed == true){
+          deleteFun();
+        }
+      }
+    },
+    itemBuilder: (context) => [
+    const PopupMenuItem(value: 'edit', child: Text('Edit')),
+    const PopupMenuItem(value: 'delete', child: Text('Delete')),
+    ],
+    ),
       // isThreeLine: true,
     );
   }

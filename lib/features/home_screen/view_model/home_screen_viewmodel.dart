@@ -71,6 +71,20 @@ class HomeScreenViewmodel extends ChangeNotifier{
     notifyListeners();
   }
 
+  void deleteServing(String id)async{
+    await _servingRepo.delete(id);
+
+    foodServings.removeWhere((s)=>s.id==id);
+    notifyListeners();
+  }
+
+  void deleteFood(String id)async{
+    await _foodRepo.delete(id);
+
+    foodItems.removeWhere((f)=>f.id==id);
+    notifyListeners();
+  }
+
   void updateUsingFoodServing(FoodServing serving) async{
 
     final relativeFood = await _foodRepo.get(serving.foodId);

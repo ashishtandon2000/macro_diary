@@ -45,9 +45,6 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.undo),),
           IconButton(onPressed: ()async{
             final confirmed = await Util.wConfirmationDialog(context,title: "Confirm",msg: "Are you sure, you want to reset the summary?");
-
-            Util.print.debug("#ONETIME ---- confirmed is $confirmed");
-
             if(confirmed==true){
               model.resetSummary();
             }
@@ -106,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           relativeFood: relativeFood
                                         );
                                       },
+                                      deleteFun: (){
+                                        model.deleteServing(serving.id);
+                                      },
                                     );
                                   }),
                                   (model.foodItems.isEmpty)?
@@ -124,6 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                       editFun: () {
                                         _navigateToManageFood(foodItem.id);
+                                      },
+                                      deleteFun: (){
+                                        model.deleteFood(foodItem.id);
                                       },
                                     );
                                   })
