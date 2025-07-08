@@ -1,13 +1,11 @@
-
-Bugs:
-- summary values needs to be rounded to two decimal place
+TODO before 1st version:
+- delete functionality
+- onetime macros
 
 TODO:
 - Handel exception
-- add null screen message
 - multiple select for delete.
 - add micros estimate fo serving mgmt.
-- Onetime meal
 - Add meals (combination of multiple food items or serving makes one meal )
 - Instead of just showing the summary total - show whole intake
 
