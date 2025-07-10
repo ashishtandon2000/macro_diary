@@ -80,7 +80,7 @@ class OneTimeMacrosInput extends StatelessWidget {
               Align(
                 heightFactor: 1,
                 alignment: Alignment.centerRight,
-                child: ElevatedButton(
+                child: OutlinedButton(
                     onPressed: (){
                       saveMacrosFunc(macros);
                       Navigator.of(context).pop();

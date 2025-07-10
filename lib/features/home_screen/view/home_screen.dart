@@ -31,6 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  _refreshScreen() {
+    context.read<HomeScreenViewmodel>().loadContent();
+  }
+
   @override
   Widget build(BuildContext context) {
     final model = context.watch<HomeScreenViewmodel>();
@@ -77,61 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           Expanded(
-                            child: TabBarView(
-                                children: [
-                                  (model.foodServings.isEmpty)?
-                                  Util.wNullScreenMessage("No food serving added yet.")
-                                      :ListView.builder(
-                                  itemCount: model.foodServings.length,
-                                  itemBuilder: (context, index) {
-                                    final serving = model.foodServings[index];
-                                    final relativeFood =
-                                        model.getFoodById(serving.foodId);
-                                    return FoodListTile(
-                                      serving: serving,
-                                      foodItem: relativeFood!,
-                                      addFun: () {
-                                        model.updateUsingFoodServing(serving);
-                                        Util.wBottomNotifyMsg(
-                                          context: context,
-                                          message: "Added ${serving.label}"
-                                        );
-                                      },
-                                      editFun: () {
-                                        _navigateToManageServing(
-                                          foods: model.foodItems,
-                                          id: serving.id,
-                                          relativeFood: relativeFood
-                                        );
-                                      },
-                                      deleteFun: (){
-                                        model.deleteServing(serving.id);
-                                      },
-                                    );
-                                  }),
-                                  (model.foodItems.isEmpty)?
-                                  Util.wNullScreenMessage("No food item added yet."):ListView.builder(
-                                  itemCount: model.foodItems.length,
-                                  itemBuilder: (context, index) {
-                                    final foodItem = model.foodItems[index];
-                                    return FoodListTile(
-                                      foodItem: foodItem,
-                                      addFun: () {
-                                        model.updateUsingFoodItem(foodItem);
-                                        Util.wBottomNotifyMsg(
-                                            context: context,
-                                            message: "Added ${foodItem.name}"
-                                        );
-                                      },
-                                      editFun: () {
-                                        _navigateToManageFood(foodItem.id);
-                                      },
-                                      deleteFun: (){
-                                        model.deleteFood(foodItem.id);
-                                      },
-                                    );
-                                  })
-                            ]),
+                            child: _tabViews(model),
                           )
                         ],
                       )),
@@ -180,10 +130,62 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
-  _refreshScreen() {
-    context.read<HomeScreenViewmodel>().loadContent();
+  TabBarView _tabViews(HomeScreenViewmodel model) {
+    return TabBarView(
+                              children: [
+                                (model.foodServings.isEmpty)?
+                                Util.wNullScreenMessage("No food serving added yet.")
+                                    :ListView.builder(
+                                itemCount: model.foodServings.length,
+                                itemBuilder: (context, index) {
+                                  final serving = model.foodServings[index];
+                                  final relativeFood =
+                                      model.getFoodById(serving.foodId);
+                                  return FoodListTile(
+                                    serving: serving,
+                                    foodItem: relativeFood!,
+                                    addFun: () {
+                                      model.updateUsingFoodServing(serving);
+                                      Util.wBottomNotifyMsg(
+                                        context: context,
+                                        message: "Added ${serving.label}"
+                                      );
+                                    },
+                                    editFun: () {
+                                      _navigateToManageServing(
+                                        foods: model.foodItems,
+                                        id: serving.id,
+                                        relativeFood: relativeFood
+                                      );
+                                    },
+                                    deleteFun: (){
+                                      model.deleteServing(serving.id);
+                                    },
+                                  );
+                                }),
+                                (model.foodItems.isEmpty)?
+                                Util.wNullScreenMessage("No food item added yet."):ListView.builder(
+                                itemCount: model.foodItems.length,
+                                itemBuilder: (context, index) {
+                                  final foodItem = model.foodItems[index];
+                                  return FoodListTile(
+                                    foodItem: foodItem,
+                                    addFun: () {
+                                      model.updateUsingFoodItem(foodItem);
+                                      Util.wBottomNotifyMsg(
+                                          context: context,
+                                          message: "Added ${foodItem.name}"
+                                      );
+                                    },
+                                    editFun: () {
+                                      _navigateToManageFood(foodItem.id);
+                                    },
+                                    deleteFun: (){
+                                      model.deleteFood(foodItem.id);
+                                    },
+                                  );
+                                })
+                          ]);
   }
 
   _navigateToManageFood([String? id]) {
@@ -205,17 +207,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _navigateToManageServing(
       {String? id, FoodItem? relativeFood,required List<FoodItem> foods}) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
+    Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => ChangeNotifierProvider(
           create: (_) => ManageServingViewmodel(
             repo: ServingRepositoryImpl(),
           )..initialLoading(id, relativeFood, foods),
           child: ManageServing(),
         ),
-      ),
-    )
-        .then((_) {
+      )).then((_) {
       _refreshScreen();
     });
   }

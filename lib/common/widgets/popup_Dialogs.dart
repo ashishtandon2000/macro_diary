@@ -10,7 +10,7 @@ Future<bool?> _confirmationDialog(BuildContext context,
         actions: [
           TextButton(onPressed: ()=> Navigator.of(context).pop(false),
               child: const Text("No")),
-          ElevatedButton(onPressed: ()=>Navigator.of(context).pop(true),
+          OutlinedButton(onPressed: ()=>Navigator.of(context).pop(true),
               child: const Text("Yes"))
         ],
       )

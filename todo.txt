@@ -1,5 +1,14 @@
 TODO before 1st version:
-- onetime macros
+- solve edge cases:
+     1. when no food item is added message should be there in food serving
+     2. reverse button should disappear if there is no previous entry to be removed
+     3. Create food page, when keyboard is opened food name gets cut off
+
+- stop rotation of screen
+- Remove debug banner
+- Setup app icon
+- Update theme & ui
+
 
 TODO:
 - Handel exception
