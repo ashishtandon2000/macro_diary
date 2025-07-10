@@ -1,4 +1,4 @@
-# macro_diary
+# micro_diary
 
 A new Flutter project.
 

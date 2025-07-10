@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:macro_diary/common/common.dart';
 import 'package:macro_diary/features/home_screen/view/widgets/food_list_tile.dart';
+import 'package:macro_diary/features/home_screen/view/widgets/onetime_macros.dart';
 import 'package:macro_diary/features/home_screen/view/widgets/summary.dart';
 import 'package:macro_diary/features/home_screen/view_model/home_screen_viewmodel.dart';
 import 'package:macro_diary/features/manage_food_and_serving/view_models/manage_food_viewmodel.dart';
@@ -141,29 +142,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _optionsRow() {
-    final foods = context.read<HomeScreenViewmodel>().foodItems;
+    final mv = context.read<HomeScreenViewmodel>();
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        ElevatedButton.icon(
-          onPressed: (){
-            _navigateToManageServing(foods: foods);
-          },
-          label: const Text("Serving"),
-          icon: const Icon(Icons.add, size: 20),
-        ),
-        ElevatedButton.icon(
-          onPressed: _navigateToManageFood,
-          label: const Text("Food"),
-          icon: const Icon(
-            Icons.add,
-            size: 20,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [ // This is your "pre-text"
+          OutlinedButton(
+            onPressed: (){
+              showDialog(context: context, builder: (context)=> Dialog(
+                child: OneTimeMacrosInput(
+                  saveMacrosFunc: mv.updateUsingMacros,
+                ),
+              ));
+            },
+            child: const Text("Add Onetime Macros"),
           ),
-        ),
-      ],
+          Row(
+            spacing: 8,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OutlinedButton(
+                onPressed: (){
+                  _navigateToManageServing(foods: mv.foodItems);
+                },
+                child: const Text("Create Serving"),
+              ),
+              OutlinedButton(
+                onPressed: _navigateToManageFood,
+                child: const Text("Create Food"),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
+
+
 
   _refreshScreen() {
     context.read<HomeScreenViewmodel>().loadContent();

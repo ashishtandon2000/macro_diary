@@ -85,6 +85,11 @@ class HomeScreenViewmodel extends ChangeNotifier{
     notifyListeners();
   }
 
+  void updateUsingMacros(Macros macros) {
+    _updateSummary(macros);
+    notifyListeners();
+  }
+
   void updateUsingFoodServing(FoodServing serving) async{
 
     final relativeFood = await _foodRepo.get(serving.foodId);
