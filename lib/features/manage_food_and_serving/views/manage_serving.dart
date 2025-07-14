@@ -20,7 +20,7 @@ class ManageServing extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Macro Diary"),
+        title: const Text("Create Serving"),
       ),
       body: mv.isLoading
           ? Util.wCircularLoader

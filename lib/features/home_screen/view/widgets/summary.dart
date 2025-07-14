@@ -47,12 +47,25 @@ class _SummaryBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      color: Colors.green,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow:  const [
+           BoxShadow(
+            color: Colors.black38,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+        shape: BoxShape.rectangle,
+        color: Colors.green.shade400,
+        borderRadius: BorderRadius.circular(12)
+      ),
+      padding: const EdgeInsets.all(12.0),
+      margin: const  EdgeInsetsGeometry.symmetric(horizontal: 4),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          minWidth: 45
+        ),
         child: Column(
           children: [
             Text("$amount", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
