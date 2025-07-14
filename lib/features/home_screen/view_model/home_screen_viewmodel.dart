@@ -10,7 +10,7 @@ import 'package:macro_diary/repositories/food_serving_repository.dart';
 import 'package:macro_diary/repositories/summary_repository.dart';
 
 
-Queue<Macros> macrosHistory = Queue<Macros>();
+Queue<Macros> _macrosHistory = Queue<Macros>();
 
 class HomeScreenViewmodel extends ChangeNotifier{
   HomeScreenViewmodel({
@@ -28,6 +28,9 @@ class HomeScreenViewmodel extends ChangeNotifier{
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  // 
+  bool get showRevertIcon => _macrosHistory.isNotEmpty; 
+  
   // Summary
   final Macros _sum = Macros(
     protein: 0,
@@ -51,11 +54,11 @@ class HomeScreenViewmodel extends ChangeNotifier{
   void _updateSummary(Macros macros){
     _sum.add(macros);
     _summaryRep.overrideSummary(_sum);
-    macrosHistory.add(macros);
+    _macrosHistory.add(macros);
   }
 
   void revertLast(){
-    _sum.subtract(macrosHistory.removeLast());
+    _sum.subtract(_macrosHistory.removeLast());
     _summaryRep.overrideSummary(_sum);
     notifyListeners();
   }

@@ -33,6 +33,7 @@ class ManageFood extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      const SizedBox(height: 5,),
                       TextFormField(
                         initialValue: initialData.name,
                         autocorrect: true,

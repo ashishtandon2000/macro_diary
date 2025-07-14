@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text("Macro Diary"),
         actions: [
-          IconButton(
+          if (model.showRevertIcon)IconButton(
             onPressed: () {
               model.revertLast();
             },

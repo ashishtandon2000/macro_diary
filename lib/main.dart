@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
             seedColor: const Color(0xFF4CAF50),
@@ -42,16 +43,16 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      // darkTheme: ThemeData(
-      //   brightness: Brightness.dark,
-      //   colorScheme: ColorScheme.fromSeed(
-      //     seedColor: const Color(0xFF4CAF50),
-      //     secondary: const Color(0xFF009688),
-      //     tertiary: const Color(0xFFFFC107),
-      //     brightness: Brightness.dark,
-      //   ),
-      //   useMaterial3: true,
-      // ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF4CAF50),
+          secondary: const Color(0xFF009688),
+          tertiary: const Color(0xFFFFC107),
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
       home: const HomeScreen(),
     );
   }
