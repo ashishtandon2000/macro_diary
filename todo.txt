@@ -1,12 +1,12 @@
 TODO before 1st version:
 
 - informative messages:
-     1. when no food item is added message should be there in food serving
      2. while adding onetime macros
      3. while creating food item
+     4. while creating serving
 
+- checks on the form before saving
 - Setup app icon
-- Update theme & ui
 
 
 TODO:

@@ -42,7 +42,23 @@ class _HomeScreenState extends State<HomeScreen> {
   _addButtonAction() {
     if (_bottomBarIndex == 0) {
       final items = context.read<HomeScreenViewmodel>().foodItems;
-      _navigateToManageServing(foods: items);
+
+      if(items.isEmpty){
+        Util.wConfirmationDialog(
+          context,
+          title: "Create Serving",
+          msg: "You have not added any food item yet. To create serving please create a food item first.",
+          yesText: "Add food"
+        ).then((confirm){
+          if(confirm == true){
+            _bottomBarIndex = 2;
+            _navigateToManageFood();
+          }
+        });
+      }else{
+        _navigateToManageServing(foods: items);
+      }
+
     } else if(_bottomBarIndex == 2){
       _navigateToManageFood();
     }
@@ -212,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
         BottomNavigationBarItem(
           icon: Icon(Icons.dinner_dining_outlined),
           activeIcon: Icon(Icons.dinner_dining),
-          label: "New Servings",
+          label: "Servings",
         ),
         BottomNavigationBarItem(
             icon: Icon(Icons.summarize_outlined),
@@ -221,7 +237,7 @@ class _HomeScreenState extends State<HomeScreen> {
         BottomNavigationBarItem(
             icon: Icon(Icons.fastfood_outlined),
             activeIcon: Icon(Icons.fastfood),
-            label: "New Food")
+            label: "Foods")
       ],
       onTap: (index) {
         Util.print.debug("Index is $index");

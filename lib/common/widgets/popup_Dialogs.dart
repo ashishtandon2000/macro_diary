@@ -1,7 +1,7 @@
 part of '../common.dart';
 
 Future<bool?> _confirmationDialog(BuildContext context,
-    {required String title,required String msg}){
+    {required String title,required String msg, String yesText = "Yes", String noText = "No"}){
   return showDialog(
       context: context,
       builder: (ctx)=>AlertDialog(
@@ -9,9 +9,9 @@ Future<bool?> _confirmationDialog(BuildContext context,
         content: Text(msg),
         actions: [
           TextButton(onPressed: ()=> Navigator.of(context).pop(false),
-              child: const Text("No")),
+              child: Text(noText)),
           OutlinedButton(onPressed: ()=>Navigator.of(context).pop(true),
-              child: const Text("Yes"))
+              child: Text(yesText))
         ],
       )
   );
