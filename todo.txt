@@ -1,28 +1,31 @@
 TODO before 1st version:
-
 - informative messages:
      2. while adding onetime macros
      3. while creating food item
      4. while creating serving
 
 - checks on the form before saving
-- Setup app icon
+- Setup app icon & Store listing.
 
 
-TODO:
-- Handel exception
+TODO (With latest approch):
+V1
+- State Management - switch to riverpod
+- Architecture - switch to Feature First MVVM
+- Local DB - instead of SharedPref use Isar
+- Use USDA FoodData for food macros recommendations
+
+V2
+- add features like BMR and and required kcal calculation etc
+- Add search option.
 - multiple select for delete.
-- add micros estimate fo serving mgmt.
-- Add meals (combination of multiple food items or serving makes one meal )
-- Instead of just showing the summary total - show whole intake
+
+FUTURE Addition etc:
+- Signup & Auth
+- Remote storage of data
+- make the data set useful
+- AI for suggestions
 
 - Improve UI
 - Add a bit of animations like hero widget etc
-- Add search option.
 - Preserve/share/import/export data
-
-FUTURE Addition etc:
-- Remote storage of data
-- add commonly used food items to auto filling
-- add features like BMR and and required kcal calculation etc
-- make the data set useful
