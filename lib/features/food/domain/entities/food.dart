@@ -4,6 +4,7 @@ enum MeasureUnit { gram, milliliter, piece }
 
 class Food {
   final String id;
+  final String? externalId; // In case if food data is fetched from external Data Source
   final String name;
   final Macros macros;
   final MeasureUnit unit;
@@ -13,6 +14,7 @@ class Food {
     required this.name,
     required this.macros,
     required this.unit,
+    this.externalId
   });
 
   Food copyWith({
