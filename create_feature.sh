@@ -9,6 +9,6 @@ fi
 
 BASE_DIR="lib/features/$FEATURE_NAME"
 
-mkdir -p $BASE_DIR/{data/{datasources,models,repositories},domain/{entities,repositories,usecases},presentation/{view,view_model}}
+mkdir -p $BASE_DIR/{data/{services,models,repositories},domain/{entities,repositories},presentation/{view,view_model}}
 
 echo "Feature '$FEATURE_NAME' created successfully!"
