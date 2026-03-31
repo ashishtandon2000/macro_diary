@@ -1,4 +1,3 @@
-part of '../common.dart';
 
 /// Can handle extracting (string, int, bool, list & map) from a map, returning datatype's 0 value in case of any error
 dynamic getMapSafely<valueType>({required Map data, required String key}) {
