@@ -1,5 +1,5 @@
 class Macros {
-  final int calories;
+  final double calories;
   final double protein;
   final double carbs;
   final double fats;
