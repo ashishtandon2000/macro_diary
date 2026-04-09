@@ -50,3 +50,7 @@ UI → ViewModel → Usecase → Repository → (API / Local DB)
 - Designed scalable repository pattern with abstraction
 - Integrated external APIs with structured data mapping
 - Built offline-first app with local caching
+
+Reference
+
+USDA APIs: https://fdc.nal.usda.gov/api-spec/fdc_api.html#/FDC/getFoodsSearch
