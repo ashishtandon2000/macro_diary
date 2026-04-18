@@ -1,7 +1,6 @@
 
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:macro_diary/core/errors/exceptions.dart';
@@ -17,7 +16,7 @@ class UsdaApiService {
     required this.apiKey
   });
 
-  Future searchFood(String query)async{
+  Future<List<FoodModel>> searchFoods(String query)async{
     final uri = Uri.parse(
       "https://api.nal.usda.gov/fdc/v1/foods/search"
         '?query=$query&api_key=$apiKey&pageSize=5'
@@ -40,7 +39,4 @@ class UsdaApiService {
       throw ParsingException("Failed to parse USDA response");
     }
   }
-
-
-
 }
