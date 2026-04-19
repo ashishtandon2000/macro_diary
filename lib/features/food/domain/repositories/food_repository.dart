@@ -3,7 +3,7 @@ import 'package:macro_diary/features/food/domain/entities/food.dart';
 abstract class FoodRepository {
   // External Search
   Future<List<Food>> searchFoods(String query);
-  Future<Food> getFoodDetails(String externalId);
+  // Future<Food> getFoodDetails(String externalId);
 
   // Local CRUD
   Future<void> addFood(Food food);
