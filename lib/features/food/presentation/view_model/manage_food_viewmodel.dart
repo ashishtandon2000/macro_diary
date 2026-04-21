@@ -79,7 +79,7 @@ class ManageFoodNotifier extends Notifier<ManageFoodState>{
   }
 
 
-  // Load Food item if editing
+  /// Load Food item if editing
   Future<void> initialLoading(String? foodId) async {
     if (foodId == null || foodId.isEmpty) return;
 
@@ -100,8 +100,34 @@ class ManageFoodNotifier extends Notifier<ManageFoodState>{
         ));
       }
 
+    }catch(e){
+      Print.error("Failed initialLoading");
     }finally{
       state = state.copyWith(isLoading: false);
+    }
+  }
+
+  /// 2. Save – create or update based on presence of an ID
+  Future<void> saveFood({Function()? callback}) async {
+    state = state.copyWith(isLoading: true);
+
+    try{
+      Print.debug("Info for saving food is: ${state.formInputs.toString()}");
+
+      final foodItem = Food(
+        name: state.formInputs.name,
+        unit: state.formInputs.unit,
+        macros: state.formInputs.macros,
+        id: "",
+      );
+
+      _repository.addFood(foodItem);
+
+    }catch(e){
+      Print.error("Failed to save food Item");
+    }finally{
+      state = state.copyWith(isLoading: false);
+      callback?.call(); // call the callback if any
     }
   }
   
