@@ -1,6 +1,7 @@
 
 
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:macro_diary/core/errors/exceptions.dart';
 import 'package:macro_diary/core/errors/failures.dart';
 import 'package:macro_diary/features/food/data/models/food_isar.dart';
@@ -8,6 +9,17 @@ import 'package:macro_diary/features/food/data/services/food_local_service.dart'
 import 'package:macro_diary/features/food/data/services/usda_api_service.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
 import 'package:macro_diary/features/food/domain/repositories/food_repository.dart';
+
+
+
+//  The Repository (Injecting the services using 'ref')
+final foodRepositoryProvider = Provider<FoodRepository>((ref) {
+  // Use ref.watch to grab the
+  final usda = ref.watch(usdaProvider);
+  final local = ref.watch(foodLocalServiceProvider);
+
+  return FoodRepositoryImpl(usdaService: usda, localService: local);
+});
 
 class FoodRepositoryImpl implements FoodRepository{
   const FoodRepositoryImpl({required this.usdaService,required this.localService});
