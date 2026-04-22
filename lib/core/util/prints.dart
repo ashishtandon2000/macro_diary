@@ -1,11 +1,11 @@
-class _appPrints{
-  const _appPrints();
+class Print{
+  const Print._();
 
-  debug(Object? object){
+  static debug(Object? object){
     print("#DEBUG || $object");
   }
 
-  error(Object? object){
+  static error(Object? object){
     print("#ERROR || $object");
   }
 }
