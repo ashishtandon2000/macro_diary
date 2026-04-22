@@ -107,7 +107,7 @@ class ManageFoodNotifier extends Notifier<ManageFoodState>{
     }
   }
 
-  /// 2. Save – create or update based on presence of an ID
+  /// Save – create or update based on presence of an ID
   Future<void> saveFood({Function()? callback}) async {
     state = state.copyWith(isLoading: true);
 
@@ -130,5 +130,18 @@ class ManageFoodNotifier extends Notifier<ManageFoodState>{
       callback?.call(); // call the callback if any
     }
   }
-  
+
+  /// Updates any change made in inputs
+  void updateInputs({Macros? macros, MeasureUnit? unit,String? name}){
+    if(macros==null && unit == null && name == null)return;
+
+    final newInputs = state.formInputs.copyWith(macros: macros, unit: unit, name: name);
+    state = state.copyWith(formInputs: newInputs);
+  }
+
+  /// Search food macros in USDA DB
+  Future<List<Food>> searchFoodInUSDA(String query)async{
+    if(query.length<=2) return [];
+    return await _repository.searchFoods(query);
+  }
 }
