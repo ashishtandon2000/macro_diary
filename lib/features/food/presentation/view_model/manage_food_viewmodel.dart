@@ -3,6 +3,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:macro_diary/core/domain/entities/macros.dart';
 import 'package:macro_diary/core/util/prints.dart';
+import 'package:macro_diary/features/food/data/repositories/food_repository_impl.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
 import 'package:uuid/uuid.dart';
 
@@ -11,67 +12,13 @@ import '../../domain/repositories/food_repository.dart';
 const uuid = Uuid();
 
 
-class FoodFormInputs {
-  final String name;
-  final MeasureUnit unit;
-  final Macros macros;
+final manageFoodProvider = NotifierProvider.autoDispose<ManageFoodNotifier, ManageFoodState>(
+  ManageFoodNotifier.new,
+);
 
-  const FoodFormInputs({
-    this.name = "",
-    this.unit = MeasureUnit.gram,
-    this.macros = const Macros(calories: 0, protein: 0, carbs: 0, fats: 0),
-  });
+class ManageFoodNotifier extends AutoDisposeNotifier<ManageFoodState>{
 
-  FoodFormInputs copyWith({
-    String? name,
-    MeasureUnit? unit,
-    Macros? macros,
-  }) {
-    return FoodFormInputs(
-      name: name ?? this.name,
-      unit: unit ?? this.unit,
-      macros: macros ?? this.macros,
-    );
-  }
-
-  @override
-  String toString() {
-    return 'FormImputs{name: $name, unit: $unit, macros: $macros}';
-  }
-}
-
-class ManageFoodState {
-  final FoodFormInputs formInputs;
-  final bool isLoading;
-  final bool createMode;
-  final Food? food;
-
-  const ManageFoodState({
-    this.formInputs = const FoodFormInputs(),
-    this.isLoading = false,
-    this.createMode = true,
-    this.food,
-  });
-
-  ManageFoodState copyWith({
-    FoodFormInputs? formInputs,
-    bool? isLoading,
-    bool? createMode,
-    Food? food,
-  }) {
-    return ManageFoodState(
-      formInputs: formInputs ?? this.formInputs,
-      isLoading: isLoading ?? this.isLoading,
-      createMode: createMode ?? this.createMode,
-      food: food ?? this.food,
-    );
-  }
-}
-
-class ManageFoodNotifier extends Notifier<ManageFoodState>{
-  final FoodRepository _repository;
-
-  ManageFoodNotifier(this._repository);
+  FoodRepository get _repository => ref.read(foodRepositoryProvider);
 
   @override
   ManageFoodState build() {
@@ -143,5 +90,63 @@ class ManageFoodNotifier extends Notifier<ManageFoodState>{
   Future<List<Food>> searchFoodInUSDA(String query)async{
     if(query.length<=2) return [];
     return await _repository.searchFoods(query);
+  }
+}
+
+
+class FoodFormInputs {
+  final String name;
+  final MeasureUnit unit;
+  final Macros macros;
+
+  const FoodFormInputs({
+    this.name = "",
+    this.unit = MeasureUnit.gram,
+    this.macros = const Macros(calories: 0, protein: 0, carbs: 0, fats: 0),
+  });
+
+  FoodFormInputs copyWith({
+    String? name,
+    MeasureUnit? unit,
+    Macros? macros,
+  }) {
+    return FoodFormInputs(
+      name: name ?? this.name,
+      unit: unit ?? this.unit,
+      macros: macros ?? this.macros,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'FormImputs{name: $name, unit: $unit, macros: $macros}';
+  }
+}
+
+class ManageFoodState {
+  final FoodFormInputs formInputs;
+  final bool isLoading;
+  final bool createMode;
+  final Food? food;
+
+  const ManageFoodState({
+    this.formInputs = const FoodFormInputs(),
+    this.isLoading = false,
+    this.createMode = true,
+    this.food,
+  });
+
+  ManageFoodState copyWith({
+    FoodFormInputs? formInputs,
+    bool? isLoading,
+    bool? createMode,
+    Food? food,
+  }) {
+    return ManageFoodState(
+      formInputs: formInputs ?? this.formInputs,
+      isLoading: isLoading ?? this.isLoading,
+      createMode: createMode ?? this.createMode,
+      food: food ?? this.food,
+    );
   }
 }
