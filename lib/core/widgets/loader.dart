@@ -1,4 +1,4 @@
-part of '../common.dart';
+part of 'ui_util.dart';
 
 const _circularLoader = Center(child: CircularProgressIndicator());
 

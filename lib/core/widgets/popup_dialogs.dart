@@ -1,4 +1,4 @@
-part of '../common.dart';
+part of 'ui_util.dart';
 
 Future<bool?> _confirmationDialog(BuildContext context,
     {required String title,required String msg, String yesText = "Yes", String noText = "No"}){
