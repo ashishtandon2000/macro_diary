@@ -1,27 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:macro_diary/core/widgets/ui_util.dart';
+import 'package:macro_diary/features/food/domain/entities/food.dart';
+
+import '../view_model/manage_food_viewmodel.dart';
 
 // TODO: Implement riverpod | refactor code
 
 
-class ManageFood extends StatelessWidget {
-  /// Create or edit food entry
-  ManageFood({super.key});
+class ManageFood extends ConsumerStatefulWidget {
+  /// Screen to handle: create or edit food entry
+  const ManageFood({super.key, this.foodId});
 
+  final String? foodId;
+
+  @override
+  ConsumerState<ManageFood> createState() => _ManageFoodState();
+}
+
+class _ManageFoodState extends ConsumerState<ManageFood> {
   final _formKey = GlobalKey<FormState>();
+  late final ManageFoodNotifier notif;
+  @override
+  void initState() {
+    super.initState();
+    notif = ref.read(manageFoodProvider.notifier);
+
+    notif.initialLoading(widget.foodId);
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    final mv = context.watch<ManageFoodViewmodel>();
+
+    final state = ref.watch(manageFoodProvider);
 
     // if createMode entries will have zero values by default...
-    var initialData =  mv.formImputs;
+    var initialData =  state.formInputs;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text((mv.createMode) ? "Create Food" : "Edit Food"),
+        title: Text((state.createMode) ? "Create Food" : "Edit Food"),
       ),
-      body: mv.isLoading
-          ? Util.wCircularLoader
+      body: state.isLoading
+          ? UIUtil.circularLoader
           : Padding(
         padding:
         const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20),
@@ -36,7 +58,7 @@ class ManageFood extends StatelessWidget {
                   autocorrect: true,
                   enableSuggestions: true,
                   onChanged: (name) {
-                    mv.formImputs.name = name;
+                    notif.updateInputs(name: name);
                   },
                   decoration: const InputDecoration(
                       labelText: "Food Name",
@@ -51,7 +73,7 @@ class ManageFood extends StatelessWidget {
                   ),
                   value: initialData.unit,
                   onChanged: (unit) {
-                    if (unit != null) mv.formImputs.unit = unit;
+                    if (unit != null) notif.updateInputs(unit: unit);
                   },
                   items: MeasureUnit.values
                       .map(
@@ -63,13 +85,13 @@ class ManageFood extends StatelessWidget {
                       .toList(),
                 ),
                 const Divider(height: 40,),
-                _showMicrosInput(initialData,mv),
+                _showMicrosInput(initialData,state),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FilledButton(
                         onPressed:(){
-                          mv.saveFood(
+                          notif.saveFood(
                               callback: ()=> Navigator.of(context).pop()
                           );
                         }, child: const Text("Save")),
@@ -83,7 +105,7 @@ class ManageFood extends StatelessWidget {
     );
   }
 
-  Widget _showMicrosInput(FoodFormImputs initialData, ManageFoodViewmodel mv){
+  Widget _showMicrosInput(FoodFormInputs initialData, ManageFoodState state){
     return Column(
 
       children: [
@@ -95,9 +117,10 @@ class ManageFood extends StatelessWidget {
                   initialValue: initialData.macros.calories.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (val) {
-                    final safeValue = int.tryParse(val);
+                    final safeValue = double.tryParse(val);
                     if(safeValue!= null){
-                      mv.formImputs.macros.calories = safeValue;
+                      final newMacro = state.formInputs.macros.copyWith(calories: safeValue);
+                      notif.updateInputs(macros: newMacro);
                     }
                   },
                   decoration: const InputDecoration(
@@ -115,7 +138,8 @@ class ManageFood extends StatelessWidget {
                   onChanged: (val) {
                     final safeValue = double.tryParse(val);
                     if(safeValue!= null){
-                      mv.formImputs.macros.protein = safeValue;
+                      final newMacro = state.formInputs.macros.copyWith(protein: safeValue);
+                      notif.updateInputs(macros: newMacro);
                     }
                   },
                   decoration: const InputDecoration(
@@ -138,7 +162,8 @@ class ManageFood extends StatelessWidget {
                 onChanged: (val) {
                   final safeValue = double.tryParse(val);
                   if(safeValue!= null){
-                    mv.formImputs.macros.fats = safeValue;
+                    final newMacro = state.formInputs.macros.copyWith(fats: safeValue);
+                    notif.updateInputs(macros: newMacro);
                   }
                 },
                 decoration: const InputDecoration(
@@ -155,7 +180,8 @@ class ManageFood extends StatelessWidget {
                 onChanged: (val) {
                   final safeValue = double.tryParse(val);
                   if(safeValue!= null){
-                    mv.formImputs.macros.carbs = safeValue;
+                    final newMacro = state.formInputs.macros.copyWith(carbs: safeValue);
+                    notif.updateInputs(macros: newMacro);
                   }
                 },
                 decoration: const InputDecoration(
@@ -170,3 +196,9 @@ class ManageFood extends StatelessWidget {
     );
   }
 }
+
+Map<MeasureUnit, String> _unitMap = {
+  MeasureUnit.gram: 'Per 100 gram',
+  MeasureUnit.milliliter: 'Per 100 milliliter',
+  MeasureUnit.piece: 'Per piece'
+};
