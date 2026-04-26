@@ -36,4 +36,13 @@ class Macros {
 
   @override
   String toString() => 'Macros(kcal: $calories, P: $protein, C: $carbs, F: $fats)';
+
+  Macros copyWith({
+    double? calories,
+    double? protein,
+    double? carbs,
+    double? fats,
+  }){
+    return Macros(calories: calories??this.calories, protein: protein??this.protein, carbs: carbs??this.carbs, fats: fats??this.fats);
+  }
 }
