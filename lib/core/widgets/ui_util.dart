@@ -9,4 +9,6 @@ class UIUtil{
   static const circularLoader = _circularLoader;
 
   static const nullScreenMsg = _nullScreenMessage;
+
+  static const confirmationDialog = _confirmationDialog;
 }
