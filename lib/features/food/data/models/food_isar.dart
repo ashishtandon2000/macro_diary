@@ -36,7 +36,7 @@ class FoodIsar {
   }
 
   static FoodIsar fromEntity(Food entity) {
-    return FoodIsar()
+    var model = FoodIsar()
       ..name = entity.name
       ..calories = entity.macros.calories
       ..protein = entity.macros.protein
@@ -44,5 +44,10 @@ class FoodIsar {
       ..fats = entity.macros.fats
       ..unit = entity.unit.name
       ..externalId = entity.externalId;
+
+    if(entity.id.isNotEmpty){
+      model.id = int.parse(entity.id);
+    }
+    return model;
   }
 }
