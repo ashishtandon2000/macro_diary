@@ -4,7 +4,7 @@ class FoodServing {
   final String id;
   final String label;
   final String foodId;
-  final int servingSize;
+  final double servingSize;
 
   const FoodServing({
     required this.id,
@@ -17,7 +17,7 @@ class FoodServing {
     String? id,
     String? label,
     String? foodId,
-    int? servingSize,
+    double? servingSize,
   }){
     return FoodServing(
       id: id ?? this.id,
