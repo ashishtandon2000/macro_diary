@@ -1,8 +1,23 @@
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:macro_diary/features/foodServing/data/services/food_serving_local_service.dart';
 import 'package:macro_diary/features/foodServing/domain/entities/food_serving.dart';
 import 'package:macro_diary/features/foodServing/domain/repositories/food_serving_repository.dart';
 
+
+
+final foodServingRepositoryImplProvider = Provider<FoodServingRepository>((ref){
+  final service = ref.read(foodServingLocalServiceProvider);
+  return FoodServingRepositoryImpl(
+    servingLocalService: service
+  );
+});
+
 class FoodServingRepositoryImpl extends FoodServingRepository{
+
+  FoodServingLocalService servingLocalService;
+
+  FoodServingRepositoryImpl({required this.servingLocalService});
 
   @override
   Future<void> addServing(FoodServing serving) {

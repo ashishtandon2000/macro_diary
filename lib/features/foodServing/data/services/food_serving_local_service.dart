@@ -1,5 +1,15 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
+import 'package:macro_diary/features/food/data/services/food_local_service.dart';
 import 'package:macro_diary/features/foodServing/data/models/food_serving_isar.dart';
+
+
+final foodServingLocalServiceProvider = Provider<FoodServingLocalService>((ref){
+  final isar = ref.read(isarProvider);
+  return FoodServingLocalService(
+    isar: isar
+  );
+});
 
 class FoodServingLocalService {
 
@@ -18,7 +28,6 @@ class FoodServingLocalService {
         isar.foodServingIsars.delete(id);
       });
   }
-
 
   Future<List<FoodServingIsar>> getAllServings()async{
     return await isar.foodServingIsars.where().findAll();
