@@ -2,12 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:macro_diary/features/food/data/models/food_isar.dart';
 
-final _isarProvider = Provider<Isar>((ref) {
+final isarProvider = Provider<Isar>((ref) {
   throw UnimplementedError();
 });
 
 final foodLocalServiceProvider = Provider<FoodLocalService>((ref) {
-  final isar = ref.watch(_isarProvider);
+  final isar = ref.read(isarProvider);
   return FoodLocalService(isar);
 });
 
