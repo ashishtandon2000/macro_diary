@@ -28,9 +28,11 @@ class FoodListingNotifier extends AutoDisposeNotifier<FoodListingState>{
   Future deleteFood(String foodId)async{
     await _repository.deleteFood(foodId);
 
-    final update = state.foods;
-    update.removeWhere((food)=> food.id == foodId);
-    state = state.copyWith(foods: update);
+    final updatedFoods = state.foods
+        .where((food) => food.id != foodId)
+        .toList();
+
+    state = state.copyWith(foods: updatedFoods);
   }
 }
 
