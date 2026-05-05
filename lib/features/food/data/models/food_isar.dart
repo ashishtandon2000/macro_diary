@@ -35,6 +35,7 @@ class FoodIsar {
     );
   }
 
+  /// Create new id
   static FoodIsar fromEntity(Food entity) {
     var model = FoodIsar()
       ..name = entity.name
@@ -44,10 +45,12 @@ class FoodIsar {
       ..fats = entity.macros.fats
       ..unit = entity.unit.name
       ..externalId = entity.externalId;
-
-    if(entity.id.isNotEmpty){
-      model.id = int.parse(entity.id);
-    }
     return model;
+  }
+
+  /// Create with existing Id
+  static FoodIsar fromEntityWithId(Food entity) {
+    return fromEntity(entity)
+      ..id = int.parse(entity.id);
   }
 }
