@@ -24,9 +24,13 @@ class FoodServingIsar {
 
   static FoodServingIsar fromEntity(FoodServing serving){
     return FoodServingIsar()
-      ..id = int.parse(serving.id)
       ..foodId = serving.foodId
       ..label = serving.label
       ..servingSize = serving.servingSize;
+  }
+
+  static FoodServingIsar fromEntityWithId(FoodServing serving){
+    return fromEntity(serving)
+        ..id = int.parse(serving.id);
   }
 }
