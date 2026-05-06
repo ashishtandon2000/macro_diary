@@ -1,7 +1,29 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:macro_diary/core/domain/entities/macros.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
 import 'package:macro_diary/features/foodServing/domain/entities/food_serving.dart';
 
+final manageServingProvider = NotifierProvider.autoDispose<ManageServingNotifier, ManageServingState>(ManageServingNotifier.new);
+
+class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState>{
+
+  @override
+  ManageServingState build() {
+    return ManageServingState();
+  }
+
+
+  void updateInputs({String? title, double? servingSize,Food? relativeFood}){
+    if(title == null && servingSize == null && relativeFood == null) return;
+
+    final update = state.formInputs.copyWith(
+        title: title,
+        relativeFood: relativeFood,
+        servingSize: servingSize
+    );
+    state.copyWith(formInputs: update);
+  }
+}
 
 class ServingFormInputs {
   final String title;
