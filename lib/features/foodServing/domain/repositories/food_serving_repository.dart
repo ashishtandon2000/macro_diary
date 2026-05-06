@@ -5,7 +5,7 @@ import 'package:macro_diary/features/foodServing/domain/entities/food_serving.da
 abstract class FoodServingRepository {
 
   Future<List<FoodServing>> getAllServings();
-  Future<FoodServing> getServingById();
+  Future<FoodServing?> getServingById(String servingId);
 
   Future<void> addServing(FoodServing serving);
   Future<void> updateServing(FoodServing serving);
