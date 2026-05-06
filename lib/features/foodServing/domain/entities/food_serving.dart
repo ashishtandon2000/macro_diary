@@ -1,5 +1,8 @@
 
 
+import 'package:macro_diary/core/domain/entities/macros.dart';
+import 'package:macro_diary/features/food/domain/entities/food.dart';
+
 class FoodServing {
   final String id;
   final String label;
@@ -27,49 +30,50 @@ class FoodServing {
     );
   }
 
-  // Map<String, dynamic> toJson() => {
-  //   'id': id,
-  //   'label': label,
-  //   'foodId': foodId,
-  //   'servingSize': servingSize,
-  // };
-  //
-  // factory FoodServing.fromJson(Map<String, dynamic> json){
-  //   return FoodServing(
-  //       id: Util.fGetMapSafely<String>(data: json,key: "id"),
-  //       label: Util.fGetMapSafely<String>(data: json,key: "label"),
-  //       foodId: Util.fGetMapSafely<String>(data: json,key: "foodId"),
-  //       servingSize: Util.fGetMapSafely<int>(data: json, key: "servingSize")
-  //   );
-  // }
-  //
-  // @override
-  // String toString() {
-  //   return 'FoodServing(id: $id, label: $label, foodId: $foodId, servingSize: $servingSize)';
-  // }
-  //
-  // // Get macros per serve for the food
-  // Macros getMacros(FoodItem food){
-  //
-  //   double perUnitRatio = _unitRatio(food.unit);
-  //   return Macros(
-  //     calories: (food.macros.calories.toDouble() * perUnitRatio * servingSize.toDouble()).toInt(),
-  //     carbs: food.macros.carbs * perUnitRatio * servingSize.toDouble(),
-  //     protein: food.macros.protein * perUnitRatio * servingSize.toDouble(),
-  //     fats: food.macros.fats * perUnitRatio * servingSize.toDouble(),
-  //   );
-  // }
-  //
-  //
-  // double _unitRatio(MeasureUnit unit) {
-  //   switch (unit) {
-  //     case MeasureUnit.gram:
-  //       return 0.01;
-  //     case MeasureUnit.milliliter:
-  //       return 0.01;
-  //     case MeasureUnit.piece:
-  //     default:
-  //       return 1.0;
-  //   }
-  // }
+
+  @override
+  String toString() {
+    return 'FoodServing(id: $id, label: $label, foodId: $foodId, servingSize: $servingSize)';
+  }
+
+  /// Get macros per serve for the food
+  Macros getMacros(Food food){
+
+    double perUnitRatio = _unitRatio(food.unit);
+    return Macros(
+      calories: food.macros.calories.toDouble() * perUnitRatio * servingSize.toDouble(),
+      carbs: food.macros.carbs * perUnitRatio * servingSize.toDouble(),
+      protein: food.macros.protein * perUnitRatio * servingSize.toDouble(),
+      fats: food.macros.fats * perUnitRatio * servingSize.toDouble(),
+    );
+  }
+
+  double _unitRatio(MeasureUnit unit) {
+    switch (unit) {
+      case MeasureUnit.gram:
+        return 0.01;
+      case MeasureUnit.milliliter:
+        return 0.01;
+      case MeasureUnit.piece:
+      default:
+        return 1.0;
+    }
+  }
+
+// Map<String, dynamic> toJson() => {
+//   'id': id,
+//   'label': label,
+//   'foodId': foodId,
+//   'servingSize': servingSize,
+// };
+//
+// factory FoodServing.fromJson(Map<String, dynamic> json){
+//   return FoodServing(
+//       id: Util.fGetMapSafely<String>(data: json,key: "id"),
+//       label: Util.fGetMapSafely<String>(data: json,key: "label"),
+//       foodId: Util.fGetMapSafely<String>(data: json,key: "foodId"),
+//       servingSize: Util.fGetMapSafely<int>(data: json, key: "servingSize")
+//   );
+// }
+//
 }
