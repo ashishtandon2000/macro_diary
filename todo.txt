@@ -29,3 +29,7 @@ FUTURE Addition etc:
 - Improve UI
 - Add a bit of animations like hero widget etc
 - Preserve/share/import/export data
+
+
+REFFER:
+https://fdc.nal.usda.gov/api-spec/fdc_api.html#/FDC/getFoodsSearch
