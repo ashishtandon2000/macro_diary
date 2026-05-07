@@ -36,15 +36,19 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   uuid: ^4.5.1
-  provider: ^6.1.5
+#  provider: ^6.1.5
   shared_preferences: ^2.3.3
   http: ^1.6.0
   isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
+  flutter_riverpod:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  isar_generator:
+  build_runner:
   mocktail:
 
   # The "flutter_lints" package below contains a set of recommended lints to
