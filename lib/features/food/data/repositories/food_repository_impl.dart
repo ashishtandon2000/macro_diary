@@ -41,7 +41,7 @@ class FoodRepositoryImpl implements FoodRepository{
   @override
   Future<void> updateFood(Food food) async{
     try{
-      final model = FoodIsar.fromEntity(food);
+      final model = FoodIsar.fromEntityWithId(food);
       await localService.addFood(model);
     }catch(_){
       throw const CacheFailure("Failed to update food");
