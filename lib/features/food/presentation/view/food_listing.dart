@@ -12,35 +12,45 @@ class FoodListing extends ConsumerWidget {
 
   final Function(Macros) addFun;
 
-  void _editFood(BuildContext context,String? foodId){
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=>ManageFood(foodId: foodId,)));
+  void _editFood(BuildContext context, String? foodId) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (ctx) => ManageFood(foodId: foodId)),
+    );
   }
 
   @override
-  Widget build(BuildContext context, ref){
-
+  Widget build(BuildContext context, WidgetRef ref) {
+    // 1. watch the provider. 'state' is now an AsyncValue<List<Food>>
     final state = ref.watch(foodListProvider);
-    final notif = ref.read(foodListProvider.notifier);
-    if(state.foods.isEmpty){
-      return UIUtil.nullScreenMsg("No food item added yet.");
-    }
 
-    return ListView.builder(
-      itemCount: state.foods.length,
-        itemBuilder: (ctx, count){
-        final food = state.foods[count];
-          return CommonListTile(
+    // 2. Use .when to handle all 3 possible states
+    return state.when(
+      // Data state: The Future resolved successfully
+      data: (foods) {
+        if (foods.isEmpty) {
+          return UIUtil.nullScreenMsg("No food item added yet.");
+        }
+
+        return ListView.builder(
+          itemCount: foods.length,
+          itemBuilder: (ctx, count) {
+            final food = foods[count];
+            return CommonListTile(
               foodItem: food,
-              editFun: (){
-                _editFood(ctx,food.id);
+              editFun: () => _editFood(ctx, food.id),
+              addFun: () => addFun(food.macros),
+              deleteFun: () {
+                // Access the notifier to call your methods
+                ref.read(foodListProvider.notifier).deleteFood(food.id);
               },
-              addFun: (){
-                addFun(food.macros);
-                //   TODO: implement this
-              },
-              deleteFun: (){
-                notif.deleteFood(food.id);
-              });
-        });
+            );
+          },
+        );
+      },
+      // Loading state: The 'build()' method in your notifier is currently running
+      loading: () => const Center(child: CircularProgressIndicator()),
+      // Error state: Something went wrong in the repository or build method
+      error: (error, stackTrace) => Center(child: Text('Error: $error')),
+    );
   }
 }
