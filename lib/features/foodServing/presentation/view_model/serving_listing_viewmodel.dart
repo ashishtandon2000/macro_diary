@@ -1,30 +1,48 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:macro_diary/features/food/domain/entities/food.dart';
+import 'package:macro_diary/features/food/presentation/view_model/food_listing_viewmodel.dart';
+import 'package:macro_diary/features/foodServing/data/repositories/food_serving_repository_impl.dart';
 import 'package:macro_diary/features/foodServing/domain/repositories/food_serving_repository.dart';
 
 import '../../domain/entities/food_serving.dart';
 
 class ServingListingNotifier extends AsyncNotifier<List<FoodServing>>{
 
-  final FoodServingRepository _repository;
-  
-  ServingListingNotifier({required FoodServingRepository repository}):_repository = repository;
+  FoodServingRepository get _servingRepo => ref.read(servingRepositoryProvider);
+  Map<String, Food> _foodsMap = {};
 
   @override
   Future<List<FoodServing>> build()async{
-    return await _repository.getAllServings();
+
+    // ref.listen(
+    //   foodListProvider,
+    //       (_, next) {
+    //     final foods = next.value ?? [];
+    //     _foodsMap = {
+    //       for(final food in foods) food.id : food
+    //     };
+    //   },
+    // );
+
+    final foods = await ref.watch(foodListProvider.future);
+    _foodsMap = { for(final food in foods) food.id : food };
+
+    return await _servingRepo.getAllServings();
   }
-  
-  Future<void> updateList()async{
-    state = AsyncData(await _repository.getAllServings());
+
+  Food? getFoodById(String id){
+    return _foodsMap[id];
   }
 
   Future<void> deleteServing(String servingId)async{
-    await _repository.deleteServing(servingId);
+    await _servingRepo.deleteServing(servingId);
     final current = state.value;
     if(current!=null){
       state = AsyncData(current.where((s)=>s.id!=servingId).toList());
     }
   }
 }
+
+final servingListingProvider = AsyncNotifierProvider<ServingListingNotifier, List<FoodServing>>(ServingListingNotifier.new);
