@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 part 'loader.dart';
 part 'popup_dialogs.dart';
 
-class UIUtil{
+class UIUtil {
   UIUtil._();
 
   static const circularLoader = _circularLoader;
@@ -11,4 +11,6 @@ class UIUtil{
   static const nullScreenMsg = _nullScreenMessage;
 
   static const confirmationDialog = _confirmationDialog;
+
+  static const bottomNotifier = _bottomNotifier;
 }

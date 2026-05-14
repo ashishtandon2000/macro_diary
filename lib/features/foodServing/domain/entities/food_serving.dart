@@ -1,5 +1,3 @@
-
-
 import 'package:macro_diary/core/domain/entities/macros.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
 
@@ -21,7 +19,7 @@ class FoodServing {
     String? label,
     String? foodId,
     double? servingSize,
-  }){
+  }) {
     return FoodServing(
       id: id ?? this.id,
       label: label ?? this.label,
@@ -30,18 +28,18 @@ class FoodServing {
     );
   }
 
-
   @override
   String toString() {
     return 'FoodServing(id: $id, label: $label, foodId: $foodId, servingSize: $servingSize)';
   }
 
   /// Get macros per serve for the food
-  Macros getMacros(Food food){
-
+  Macros getMacros(Food food) {
     double perUnitRatio = _unitRatio(food.unit);
     return Macros(
-      calories: food.macros.calories.toDouble() * perUnitRatio * servingSize.toDouble(),
+      calories: food.macros.calories.toDouble() *
+          perUnitRatio *
+          servingSize.toDouble(),
       carbs: food.macros.carbs * perUnitRatio * servingSize.toDouble(),
       protein: food.macros.protein * perUnitRatio * servingSize.toDouble(),
       fats: food.macros.fats * perUnitRatio * servingSize.toDouble(),
@@ -55,7 +53,6 @@ class FoodServing {
       case MeasureUnit.milliliter:
         return 0.01;
       case MeasureUnit.piece:
-      default:
         return 1.0;
     }
   }

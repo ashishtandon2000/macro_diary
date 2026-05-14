@@ -9,7 +9,7 @@ import 'package:macro_diary/features/foodServing/domain/repositories/food_servin
 
 
 
-final foodServingRepositoryImplProvider = Provider<FoodServingRepository>((ref){
+final servingRepositoryProvider = Provider<FoodServingRepository>((ref){
   final service = ref.read(foodServingLocalServiceProvider);
   return FoodServingRepositoryImpl(
     servingLocalService: service

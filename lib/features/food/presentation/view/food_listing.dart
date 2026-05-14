@@ -35,7 +35,7 @@ class FoodListing extends ConsumerWidget {
           itemCount: foods.length,
           itemBuilder: (ctx, count) {
             final food = foods[count];
-            return CommonListTile(
+            return CommonListTile.food(
               foodItem: food,
               editFun: () => _editFood(ctx, food.id),
               addFun: () => addFun(food.macros),
@@ -48,9 +48,9 @@ class FoodListing extends ConsumerWidget {
         );
       },
       // Loading state: The 'build()' method in your notifier is currently running
-      loading: () => const Center(child: CircularProgressIndicator()),
+      loading: () => UIUtil.circularLoader,
       // Error state: Something went wrong in the repository or build method
-      error: (error, stackTrace) => Center(child: Text('Error: $error')),
+      error: (error, stackTrace) =>UIUtil.nullScreenMsg("Error: $error"),
     );
   }
 }
