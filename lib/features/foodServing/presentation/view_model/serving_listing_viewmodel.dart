@@ -8,14 +8,12 @@ import 'package:macro_diary/features/foodServing/domain/repositories/food_servin
 
 import '../../domain/entities/food_serving.dart';
 
-class ServingListingNotifier extends AsyncNotifier<List<FoodServing>>{
-
+class ServingListingNotifier extends AsyncNotifier<List<FoodServing>> {
   FoodServingRepository get _servingRepo => ref.read(servingRepositoryProvider);
   Map<String, Food> _foodsMap = {};
 
   @override
-  Future<List<FoodServing>> build()async{
-
+  Future<List<FoodServing>> build() async {
     // ref.listen(
     //   foodListProvider,
     //       (_, next) {
@@ -27,22 +25,27 @@ class ServingListingNotifier extends AsyncNotifier<List<FoodServing>>{
     // );
 
     final foods = await ref.watch(foodListProvider.future);
-    _foodsMap = { for(final food in foods) food.id : food };
+    _foodsMap = {for (final food in foods) food.id: food};
 
-    return await _servingRepo.getAllServings();
+    final servings = await _servingRepo.getAllServings();
+    return servings
+        .where((serving) => _foodsMap.containsKey(serving.foodId))
+        .toList();
   }
 
-  Food? getFoodById(String id){
+  Food? getFoodById(String id) {
     return _foodsMap[id];
   }
 
-  Future<void> deleteServing(String servingId)async{
+  Future<void> deleteServing(String servingId) async {
     await _servingRepo.deleteServing(servingId);
     final current = state.value;
-    if(current!=null){
-      state = AsyncData(current.where((s)=>s.id!=servingId).toList());
+    if (current != null) {
+      state = AsyncData(current.where((s) => s.id != servingId).toList());
     }
   }
 }
 
-final servingListingProvider = AsyncNotifierProvider<ServingListingNotifier, List<FoodServing>>(ServingListingNotifier.new);
+final servingListingProvider =
+    AsyncNotifierProvider<ServingListingNotifier, List<FoodServing>>(
+        ServingListingNotifier.new);

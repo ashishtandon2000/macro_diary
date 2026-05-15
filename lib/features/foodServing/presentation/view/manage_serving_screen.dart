@@ -20,10 +20,13 @@ class _ManageServing extends ConsumerState<ManageServing> {
 
   @override
   void initState() {
-    notif = ref.read(manageServingProvider.notifier);
-
-    notif.initialLoading(widget.servingId);
     super.initState();
+    notif = ref.read(manageServingProvider.notifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        notif.initialLoading(widget.servingId);
+      }
+    });
   }
 
   @override
@@ -45,26 +48,45 @@ class _ManageServing extends ConsumerState<ManageServing> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      if (state.errorMessage.isNotEmpty) ...[
+                        _showErrorMessage(context, state.errorMessage),
+                        const SizedBox(height: 12),
+                      ],
                       TextFormField(
                           autocorrect: true,
                           enableSuggestions: true,
                           initialValue: state.formInputs.title,
+                          validator: (title) {
+                            if (title == null || title.trim().isEmpty) {
+                              return "Please enter a serving title";
+                            }
+                            return null;
+                          },
                           decoration: const InputDecoration(
                               border: OutlineInputBorder(),
                               labelText: "Serving Title",
                               hintText: "Serving....",
                               prefixIcon: Icon(Icons.dinner_dining)),
                           onChanged: (t) {
-                            if (t.isNotEmpty) notif.updateInputs(title: t);
+                            notif.updateInputs(title: t);
                           }),
                       const SizedBox(
                         height: 12,
                       ),
                       TextFormField(
-                        keyboardType: TextInputType.number,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
                         autocorrect: true,
                         enableSuggestions: true,
                         initialValue: state.formInputs.servingSize.toString(),
+                        validator: (amount) {
+                          final value = double.tryParse(amount ?? "");
+                          if (value == null || value <= 0 || !value.isFinite) {
+                            return "Enter a serving size greater than zero";
+                          }
+                          return null;
+                        },
                         decoration: InputDecoration(
                           border: const OutlineInputBorder(),
                           labelText: "Serving Size",
@@ -80,16 +102,16 @@ class _ManageServing extends ConsumerState<ManageServing> {
                         },
                       ),
                       _showEstimatedMacros(notif.getEstimatedMacros(
-                          100,
-                          state.formInputs
-                              .relativeFood)), // #TODO: get estimated macros from the form
+                          state.formInputs.servingSize,
+                          state.formInputs.relativeFood)),
                       const SizedBox(
                         width: 20,
                       ),
                       const Divider(
                         height: 30,
                       ),
-                      (state.createMode)
+                      (state.createMode ||
+                              state.formInputs.relativeFood.id.isEmpty)
                           ? const _FoodSelectionMenu()
                           : _showRelativeFood(state.formInputs.relativeFood),
                       Row(
@@ -97,9 +119,27 @@ class _ManageServing extends ConsumerState<ManageServing> {
                         children: [
                           FilledButton(
                               onPressed: () async {
+                                if (_formKey.currentState?.validate() != true) {
+                                  return;
+                                }
+
                                 final success = await notif.saveFoodServing();
-                                if (context.mounted && success) {
+                                if (!context.mounted) {
+                                  return;
+                                }
+
+                                if (success) {
                                   Navigator.of(context).pop();
+                                } else {
+                                  final error = ref
+                                      .read(manageServingProvider)
+                                      .errorMessage;
+                                  UIUtil.bottomNotifier(
+                                    context: context,
+                                    message: error.isEmpty
+                                        ? "Failed to save serving"
+                                        : error,
+                                  );
                                 }
                               },
                               child: const Text("Save")),
@@ -130,6 +170,16 @@ class _ManageServing extends ConsumerState<ManageServing> {
     );
   }
 
+  Widget _showErrorMessage(BuildContext context, String message) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        message,
+        style: TextStyle(color: Theme.of(context).colorScheme.error),
+      ),
+    );
+  }
+
   Widget _showRelativeFood(Food food) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,10 +204,31 @@ class _FoodSelectionMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final foods = ref.watch(manageServingProvider.select((s) => s.foods));
+    final state = ref.watch(manageServingProvider);
+    final foods = state.foods;
     final notif = ref.read(manageServingProvider.notifier);
-    return DropdownButtonFormField(
-      decoration: const InputDecoration(label: Text("Serving of: ")),
+
+    Food? selectedFood;
+    for (final food in foods) {
+      if (food.id == state.formInputs.relativeFood.id) {
+        selectedFood = food;
+        break;
+      }
+    }
+
+    return DropdownButtonFormField<Food>(
+      decoration: const InputDecoration(
+        label: Text("Serving of: "),
+        border: OutlineInputBorder(),
+      ),
+      isExpanded: true,
+      value: selectedFood,
+      validator: (food) {
+        if (food == null) {
+          return "Please select a food item";
+        }
+        return null;
+      },
       items: foods
           .map((e) => DropdownMenuItem(
                 value: e,
