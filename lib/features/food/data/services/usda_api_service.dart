@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,12 +6,9 @@ import 'package:macro_diary/core/errors/exceptions.dart';
 import 'package:macro_diary/core/util/http.dart';
 import 'package:macro_diary/features/food/data/models/food_model.dart';
 
-
-
-final usdaProvider = Provider<UsdaApiService>((ref){
-
+final usdaProvider = Provider<UsdaApiService>((ref) {
   final client = ref.read(httpClientProvider);
-  const key = String.fromEnvironment("usda_api_key");
+  const key = String.fromEnvironment("usda_api_key", defaultValue: "DEMO_KEY");
   return UsdaApiService(client: client, apiKey: key);
 });
 
@@ -26,10 +21,15 @@ class UsdaApiService {
     required this.apiKey
   });
 
-  Future<List<FoodModel>> searchFoods(String query)async{
-    final uri = Uri.parse(
-      "https://api.nal.usda.gov/fdc/v1/foods/search"
-        '?query=$query&api_key=$apiKey&pageSize=5'
+  Future<List<FoodModel>> searchFoods(String query) async {
+    final uri = Uri.https(
+      "api.nal.usda.gov",
+      "/fdc/v1/foods/search",
+      {
+        "query": query,
+        "api_key": apiKey,
+        "pageSize": "5",
+      },
     );
 
     final response = await client.get(uri);
