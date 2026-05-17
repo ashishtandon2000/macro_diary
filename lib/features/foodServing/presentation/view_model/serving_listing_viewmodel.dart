@@ -11,6 +11,7 @@ import '../../domain/entities/food_serving.dart';
 class ServingListingNotifier extends AsyncNotifier<List<FoodServing>> {
   FoodServingRepository get _servingRepo => ref.read(servingRepositoryProvider);
   Map<String, Food> _foodsMap = {};
+  Map<String, Food> get foodsMap => _foodsMap;
 
   @override
   Future<List<FoodServing>> build() async {
@@ -29,7 +30,7 @@ class ServingListingNotifier extends AsyncNotifier<List<FoodServing>> {
 
     final servings = await _servingRepo.getAllServings();
     return servings
-        .where((serving) => _foodsMap.containsKey(serving.foodId))
+        .where((serving) => serving.hasAvailableFoods(_foodsMap))
         .toList();
   }
 
