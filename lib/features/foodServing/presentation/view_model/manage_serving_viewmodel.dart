@@ -41,17 +41,30 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
 
       final serving = await servingFuture;
       final foods = await foodsFuture;
-      final selectedFood = serving == null
-          ? (foods.isNotEmpty ? foods.first : _emptyFood)
-          : _findFoodById(foods, serving.foodId) ?? _emptyFood;
+      final items = serving == null
+          ? [
+              ServingFoodInput(
+                food: foods.isNotEmpty ? foods.first : _emptyFood,
+                servingSize: 1,
+              ),
+            ]
+          : serving.items
+              .map(
+                (item) => ServingFoodInput(
+                  food: _findFoodById(foods, item.foodId) ?? _emptyFood,
+                  servingSize: item.servingSize,
+                ),
+              )
+              .toList();
 
       String errorMessage = "";
       if (foods.isEmpty) {
         errorMessage = "Add a food item before creating a serving.";
       } else if (isEditing && serving == null) {
         errorMessage = "Serving not found.";
-      } else if (serving != null && selectedFood.id.isEmpty) {
-        errorMessage = "The food item for this serving is no longer available.";
+      } else if (serving != null && items.any((item) => item.food.id.isEmpty)) {
+        errorMessage =
+            "Some food items for this serving are no longer available.";
       }
 
       state = state.copyWith(
@@ -60,11 +73,10 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
         foods: foods,
         errorMessage: errorMessage,
         formInputs: serving == null
-            ? state.formInputs.copyWith(relativeFood: selectedFood)
+            ? state.formInputs.copyWith(items: items)
             : ServingFormInputs(
                 title: serving.label,
-                servingSize: serving.servingSize,
-                relativeFood: selectedFood,
+                items: items,
               ),
       );
     } catch (_) {
@@ -89,8 +101,14 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
       final serving = FoodServing(
         id: state.createMode ? "" : state.serving?.id ?? "",
         label: state.formInputs.title.trim(),
-        foodId: state.formInputs.relativeFood.id,
-        servingSize: state.formInputs.servingSize,
+        items: state.formInputs.items
+            .map(
+              (item) => FoodServingItem(
+                foodId: item.food.id,
+                servingSize: item.servingSize,
+              ),
+            )
+            .toList(),
       );
 
       final savedServing = state.createMode
@@ -103,7 +121,6 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
           createMode: false,
           formInputs: state.formInputs.copyWith(
             title: savedServing.label,
-            servingSize: savedServing.servingSize,
           ),
         );
       } else {
@@ -118,39 +135,85 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
     }
   }
 
-  Macros getEstimatedMacros(double servingSize, Food? selectedFood) {
-    final food = selectedFood ?? state.formInputs.relativeFood;
-    if (food.id.isEmpty || servingSize <= 0 || !servingSize.isFinite) {
-      return _emptyMacros;
-    }
-
+  Macros getEstimatedMacros() {
+    final foodMap = {for (final food in state.foods) food.id: food};
     final tempServing = FoodServing(
       id: "",
-      foodId: food.id,
-      servingSize: servingSize,
       label: "Temp Label",
+      items: state.formInputs.items
+          .map(
+            (item) => FoodServingItem(
+              foodId: item.food.id,
+              servingSize: item.servingSize,
+            ),
+          )
+          .toList(),
     );
-    return tempServing.getMacros(food);
+    return tempServing.getMacros(foodMap);
   }
 
-  void updateInputs({String? title, double? servingSize, Food? relativeFood}) {
-    if (title == null && servingSize == null && relativeFood == null) return;
+  void updateInputs({String? title}) {
+    if (title == null) return;
 
-    final update = state.formInputs.copyWith(
-        title: title, relativeFood: relativeFood, servingSize: servingSize);
+    final update = state.formInputs.copyWith(title: title);
     state = state.copyWith(formInputs: update, errorMessage: "");
+  }
+
+  void updateItem(int index, {Food? food, double? servingSize}) {
+    if (index < 0 || index >= state.formInputs.items.length) return;
+
+    final items = [...state.formInputs.items];
+    items[index] = items[index].copyWith(
+      food: food,
+      servingSize: servingSize,
+    );
+    state = state.copyWith(
+      formInputs: state.formInputs.copyWith(items: items),
+      errorMessage: "",
+    );
+  }
+
+  void addItem() {
+    if (state.foods.isEmpty) return;
+    state = state.copyWith(
+      formInputs: state.formInputs.copyWith(
+        items: [
+          ...state.formInputs.items,
+          ServingFoodInput(food: state.foods.first, servingSize: 1),
+        ],
+      ),
+      errorMessage: "",
+    );
+  }
+
+  void removeItem(int index) {
+    if (state.formInputs.items.length <= 1 ||
+        index < 0 ||
+        index >= state.formInputs.items.length) {
+      return;
+    }
+
+    final items = [...state.formInputs.items]..removeAt(index);
+    state = state.copyWith(
+      formInputs: state.formInputs.copyWith(items: items),
+      errorMessage: "",
+    );
   }
 
   String? _validationMessage() {
     if (state.formInputs.title.trim().isEmpty) {
       return "Please enter a serving title.";
     }
-    if (state.formInputs.servingSize <= 0 ||
-        !state.formInputs.servingSize.isFinite) {
-      return "Serving size must be greater than zero.";
+    if (state.formInputs.items.isEmpty) {
+      return "Please add at least one food item.";
     }
-    if (state.formInputs.relativeFood.id.isEmpty) {
-      return "Please select a food item for this serving.";
+    for (final item in state.formInputs.items) {
+      if (item.food.id.isEmpty) {
+        return "Please select a food item for each row.";
+      }
+      if (item.servingSize <= 0 || !item.servingSize.isFinite) {
+        return "Each food amount must be greater than zero.";
+      }
     }
     return null;
   }
@@ -163,20 +226,41 @@ class ManageServingNotifier extends AutoDisposeNotifier<ManageServingState> {
   }
 }
 
+class ServingFoodInput {
+  final Food food;
+  final double servingSize;
+
+  const ServingFoodInput({
+    required this.food,
+    required this.servingSize,
+  });
+
+  ServingFoodInput copyWith({
+    Food? food,
+    double? servingSize,
+  }) {
+    return ServingFoodInput(
+      food: food ?? this.food,
+      servingSize: servingSize ?? this.servingSize,
+    );
+  }
+}
+
 class ServingFormInputs {
   final String title;
-  final double servingSize;
-  final Food relativeFood;
+  final List<ServingFoodInput> items;
 
   const ServingFormInputs(
-      {this.title = "", this.servingSize = 1, this.relativeFood = _emptyFood});
+      {this.title = "",
+      this.items = const [
+        ServingFoodInput(food: _emptyFood, servingSize: 1),
+      ]});
 
-  ServingFormInputs copyWith(
-      {String? title, double? servingSize, Food? relativeFood}) {
+  ServingFormInputs copyWith({String? title, List<ServingFoodInput>? items}) {
     return ServingFormInputs(
-        title: title ?? this.title,
-        servingSize: servingSize ?? this.servingSize,
-        relativeFood: relativeFood ?? this.relativeFood);
+      title: title ?? this.title,
+      items: items ?? this.items,
+    );
   }
 }
 
