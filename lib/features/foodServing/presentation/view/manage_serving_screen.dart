@@ -70,50 +70,16 @@ class _ManageServing extends ConsumerState<ManageServing> {
                           onChanged: (t) {
                             notif.updateInputs(title: t);
                           }),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      TextFormField(
-                        keyboardType: const TextInputType.numberWithOptions(
-                          decimal: true,
-                        ),
-                        autocorrect: true,
-                        enableSuggestions: true,
-                        initialValue: state.formInputs.servingSize.toString(),
-                        validator: (amount) {
-                          final value = double.tryParse(amount ?? "");
-                          if (value == null || value <= 0 || !value.isFinite) {
-                            return "Enter a serving size greater than zero";
-                          }
-                          return null;
-                        },
-                        decoration: InputDecoration(
-                          border: const OutlineInputBorder(),
-                          labelText: "Serving Size",
-                          hintText: "Amount....",
-                          prefixIcon: const Icon(Icons.dinner_dining),
-                          suffixText: state.formInputs.relativeFood.unit.name,
-                        ),
-                        onChanged: (amount) {
-                          final safeValue = double.tryParse(amount);
-                          if (safeValue != null) {
-                            notif.updateInputs(servingSize: safeValue);
-                          }
-                        },
-                      ),
-                      _showEstimatedMacros(notif.getEstimatedMacros(
-                          state.formInputs.servingSize,
-                          state.formInputs.relativeFood)),
+                      const SizedBox(height: 20),
+                      const _ServingItemsEditor(),
+                      const SizedBox(height: 12),
+                      _showEstimatedMacros(notif.getEstimatedMacros()),
                       const SizedBox(
                         width: 20,
                       ),
                       const Divider(
                         height: 30,
                       ),
-                      (state.createMode ||
-                              state.formInputs.relativeFood.id.isEmpty)
-                          ? const _FoodSelectionMenu()
-                          : _showRelativeFood(state.formInputs.relativeFood),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -179,28 +145,10 @@ class _ManageServing extends ConsumerState<ManageServing> {
       ),
     );
   }
-
-  Widget _showRelativeFood(Food food) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Serving of:",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        ),
-        ListTile(
-          title: Text(food.name),
-          subtitle: Text(
-              "Calories: ${food.macros.calories} | Protein: ${food.macros.protein} | Fats: ${food.macros.fats} | Carbs: ${food.macros.carbs}"),
-          // isThreeLine: true,
-        ),
-      ],
-    );
-  }
 }
 
-class _FoodSelectionMenu extends ConsumerWidget {
-  const _FoodSelectionMenu();
+class _ServingItemsEditor extends ConsumerWidget {
+  const _ServingItemsEditor();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -208,38 +156,127 @@ class _FoodSelectionMenu extends ConsumerWidget {
     final foods = state.foods;
     final notif = ref.read(manageServingProvider.notifier);
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            "Food items:",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        ),
+        const SizedBox(height: 12),
+        for (var index = 0; index < state.formInputs.items.length; index++) ...[
+          _ServingItemRow(index: index),
+          const SizedBox(height: 12),
+        ],
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            onPressed: foods.isEmpty ? null : notif.addItem,
+            icon: const Icon(Icons.add),
+            label: const Text("Add Food"),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ServingItemRow extends ConsumerWidget {
+  const _ServingItemRow({required this.index});
+
+  final int index;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(manageServingProvider);
+    if (index >= state.formInputs.items.length) {
+      return const SizedBox.shrink();
+    }
+
+    final item = state.formInputs.items[index];
+    final foods = state.foods;
+    final notif = ref.read(manageServingProvider.notifier);
+
     Food? selectedFood;
     for (final food in foods) {
-      if (food.id == state.formInputs.relativeFood.id) {
+      if (food.id == item.food.id) {
         selectedFood = food;
         break;
       }
     }
 
-    return DropdownButtonFormField<Food>(
-      decoration: const InputDecoration(
-        label: Text("Serving of: "),
-        border: OutlineInputBorder(),
-      ),
-      isExpanded: true,
-      value: selectedFood,
-      validator: (food) {
-        if (food == null) {
-          return "Please select a food item";
-        }
-        return null;
-      },
-      items: foods
-          .map((e) => DropdownMenuItem(
-                value: e,
-                child: Text(e.name),
-              ))
-          .toList(),
-      onChanged: (food) {
-        if (food != null) {
-          notif.updateInputs(relativeFood: food);
-        }
-      },
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: DropdownButtonFormField<Food>(
+            decoration: const InputDecoration(
+              label: Text("Food"),
+              border: OutlineInputBorder(),
+            ),
+            isExpanded: true,
+            value: selectedFood,
+            validator: (food) {
+              if (food == null) {
+                return "Select food";
+              }
+              return null;
+            },
+            items: foods
+                .map((food) => DropdownMenuItem(
+                      value: food,
+                      child: Text(
+                        food.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ))
+                .toList(),
+            onChanged: (food) {
+              if (food != null) {
+                notif.updateItem(index, food: food);
+              }
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 2,
+          child: TextFormField(
+            key: ValueKey("serving-item-$index-${item.food.id}"),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            initialValue: item.servingSize.toString(),
+            validator: (amount) {
+              final value = double.tryParse(amount ?? "");
+              if (value == null || value <= 0 || !value.isFinite) {
+                return "Invalid";
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              labelText: "Amount",
+              border: const OutlineInputBorder(),
+              suffixText: item.food.unit.name,
+            ),
+            onChanged: (amount) {
+              final value = double.tryParse(amount);
+              if (value != null) {
+                notif.updateItem(index, servingSize: value);
+              }
+            },
+          ),
+        ),
+        IconButton(
+          tooltip: "Remove food",
+          onPressed: state.formInputs.items.length <= 1
+              ? null
+              : () => notif.removeItem(index),
+          icon: const Icon(Icons.remove_circle_outline),
+        ),
+      ],
     );
   }
 }
