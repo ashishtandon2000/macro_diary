@@ -7,6 +7,9 @@ abstract class Failure {
 
 class ServerFailure extends Failure {
   const ServerFailure([super.message = "Server error"]);
+
+  @override
+  String toString() => message;
 }
 
 class CacheFailure extends Failure {

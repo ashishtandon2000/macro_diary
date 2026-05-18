@@ -25,7 +25,11 @@ class _ManageFoodState extends ConsumerState<ManageFood> {
     super.initState();
     notif = ref.read(manageFoodProvider.notifier);
 
-    notif.initialLoading(widget.foodId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        notif.initialLoading(widget.foodId);
+      }
+    });
   }
 
   @override

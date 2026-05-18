@@ -57,12 +57,15 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
     final foods = await foodsFuture;
     final servings = await servingsFuture;
     final foodMap = {for (final food in foods) food.id: food};
+    final validServings = servings
+        .where((serving) => serving.hasAvailableFoods(foodMap))
+        .toList();
 
     return DashboardState(
       summary: summary ?? _emptyMacros,
       history: history ?? const [],
       foods: foods,
-      servings: servings,
+      servings: validServings,
       foodMap: foodMap,
     );
   }
@@ -87,10 +90,9 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
     final current = state.value;
     if (current == null) return false;
 
-    final relativeFood = current.getFoodById(serving.foodId);
-    if (relativeFood == null) return false;
+    if (!serving.hasAvailableFoods(current.foodMap)) return false;
 
-    updateUsingMacros(serving.getMacros(relativeFood));
+    updateUsingMacros(serving.getMacros(current.foodMap));
     return true;
   }
 
@@ -141,9 +143,13 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
     if (current == null) return;
 
     final foods = current.foods.where((food) => food.id != foodId).toList();
+    final servings = current.servings
+        .where((serving) => !serving.containsFood(foodId))
+        .toList();
     state = AsyncData(
       current.copyWith(
         foods: foods,
+        servings: servings,
         foodMap: {for (final food in foods) food.id: food},
       ),
     );

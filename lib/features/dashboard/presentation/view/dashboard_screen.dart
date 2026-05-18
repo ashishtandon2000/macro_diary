@@ -188,12 +188,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       itemCount: model.servings.length,
       itemBuilder: (context, index) {
         final serving = model.servings[index];
-        final relativeFood = model.getFoodById(serving.foodId);
-        if (relativeFood == null) return const SizedBox.shrink();
+        if (!serving.hasAvailableFoods(model.foodMap)) {
+          return const SizedBox.shrink();
+        }
 
         return CommonListTile.serving(
           serving: serving,
-          foodItem: relativeFood,
+          foodsById: model.foodMap,
           addFun: () => _addServingToSummary(context, serving),
           editFun: () => _navigateToManageServing(serving.id),
           deleteFun: () async {
