@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:macro_diary/core/errors/exceptions.dart';
 import 'package:macro_diary/core/util/http.dart';
+import 'package:macro_diary/core/util/prints.dart';
 import 'package:macro_diary/features/food/data/models/food_model.dart';
 
 final usdaProvider = Provider<UsdaApiService>((ref) {
@@ -32,9 +33,15 @@ class UsdaApiService {
       },
     );
 
-    final response = await client.get(uri);
+    final response = await client.get(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+      }
+    );
 
     if (response.statusCode != 200) {
+      Print.debug("Failed USDA response${response.body}");
       throw ServerException();
     }
 
