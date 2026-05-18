@@ -18,13 +18,13 @@ class ServingListing extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context,WidgetRef ref){
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(servingListingProvider);
     final notif = ref.watch(servingListingProvider.notifier);
 
     return state.when(
-        data: (servings){
-          if(servings.isEmpty){
+        data: (servings) {
+          if (servings.isEmpty) {
             return UIUtil.nullScreenMsg("No food servings item added yet.");
           }
 
@@ -32,15 +32,14 @@ class ServingListing extends ConsumerWidget {
             itemCount: servings.length,
             itemBuilder: (ctx, count) {
               final serving = servings[count];
-              final food = notif.getFoodById(serving.foodId);
-              if(food==null){
+              if (!serving.hasAvailableFoods(notif.foodsMap)) {
                 return const SizedBox();
               }
 
-              final calculatedMacros = serving.getMacros(food);
+              final calculatedMacros = serving.getMacros(notif.foodsMap);
               return CommonListTile.serving(
                 serving: serving,
-                foodItem: food,
+                foodsById: notif.foodsMap,
                 editFun: () => _editFood(ctx, serving.id),
                 addFun: () => addFun(calculatedMacros),
                 deleteFun: () {
@@ -50,8 +49,7 @@ class ServingListing extends ConsumerWidget {
             },
           );
         },
-        error: (error, stackTrace) =>UIUtil.nullScreenMsg("Error: $error"),
-        loading: ()=>UIUtil.circularLoader);
+        error: (error, stackTrace) => UIUtil.nullScreenMsg("Error: $error"),
+        loading: () => UIUtil.circularLoader);
   }
-
 }
