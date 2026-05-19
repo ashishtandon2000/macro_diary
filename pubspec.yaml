@@ -43,8 +43,11 @@ dependencies:
   isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.5
   flutter_riverpod:
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
+
   flutter_test:
     sdk: flutter
   isar_generator:
@@ -99,3 +102,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+flutter_icons:
+  android: true
+  image_path: "assets/icons/app_icon.png"
+
+flutter_native_splash:
+  color: "#000000"        # background color
+  image: "assets/iconss/app_icon.png"  # center logo
+  android: true
+  ios: true
+  fullscreen: true
+
+  android_12:
+    color: "#000000"
+    image: "assets/icons/app_icon.png"
