@@ -6,8 +6,8 @@ import 'package:macro_diary/features/dashboard/presentation/view/widgets/one_tim
 import 'package:macro_diary/features/dashboard/presentation/view/widgets/summary_view.dart';
 import 'package:macro_diary/features/dashboard/presentation/view_model/dashboard_viewmodel.dart';
 import 'package:macro_diary/features/food/presentation/view/manage_food_screen.dart';
-import 'package:macro_diary/features/foodServing/domain/entities/food_serving.dart';
-import 'package:macro_diary/features/foodServing/presentation/view/manage_serving_screen.dart';
+import 'package:macro_diary/features/meal/domain/entities/meal.dart';
+import 'package:macro_diary/features/meal/presentation/view/manage_meal_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -17,7 +17,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
-  // 0-serving, 1-summary, 2-food
+  // 0-meal, 1-summary, 2-food
   int _bottomBarIndex = 1;
 
   Future<void> _navigateToManageFood([String? foodId]) async {
@@ -30,10 +30,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     }
   }
 
-  Future<void> _navigateToManageServing([String? servingId]) async {
+  Future<void> _navigateToManageMeal([String? mealId]) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ManageServing(servingId: servingId),
+        builder: (context) => ManageMeal(mealId: mealId),
       ),
     );
 
@@ -47,9 +47,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       if (model.foods.isEmpty) {
         final confirm = await UIUtil.confirmationDialog(
           context,
-          title: "Create Serving",
+          title: "Create Meal",
           msg:
-              "You have not added any food item yet. To create serving please create a food item first.",
+              "You have not added any food item yet. To create a meal, please create a food item first.",
           yesText: "Add food",
         );
 
@@ -60,7 +60,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           await _navigateToManageFood();
         }
       } else {
-        await _navigateToManageServing();
+        await _navigateToManageMeal();
       }
     } else if (_bottomBarIndex == 2) {
       await _navigateToManageFood();
@@ -117,7 +117,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget _getBody(DashboardState model) {
     switch (_bottomBarIndex) {
       case 0:
-        return _servingsBody(model);
+        return _mealsBody(model);
       case 1:
         return _summaryBody(model);
       case 2:
@@ -164,7 +164,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               children: [
                 const TabBar(
                   tabs: [
-                    Tab(child: Text("Recent Servings")),
+                    Tab(child: Text("Recent Meals")),
                     Tab(child: Text("Saved Foods")),
                   ],
                 ),
@@ -179,28 +179,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _servingsBody(DashboardState model) {
-    if (model.servings.isEmpty) {
-      return UIUtil.nullScreenMsg("No food serving added yet.");
+  Widget _mealsBody(DashboardState model) {
+    if (model.meals.isEmpty) {
+      return UIUtil.nullScreenMsg("No meal added yet.");
     }
 
     return ListView.builder(
-      itemCount: model.servings.length,
+      itemCount: model.meals.length,
       itemBuilder: (context, index) {
-        final serving = model.servings[index];
-        if (!serving.hasAvailableFoods(model.foodMap)) {
+        final meal = model.meals[index];
+        if (!meal.hasAvailableFoods(model.foodMap)) {
           return const SizedBox.shrink();
         }
 
-        return CommonListTile.serving(
-          serving: serving,
+        return CommonListTile.meal(
+          meal: meal,
           foodsById: model.foodMap,
-          addFun: () => _addServingToSummary(context, serving),
-          editFun: () => _navigateToManageServing(serving.id),
+          addFun: () => _addMealToSummary(context, meal),
+          editFun: () => _navigateToManageMeal(meal.id),
           deleteFun: () async {
-            await ref
-                .read(dashboardProvider.notifier)
-                .deleteServing(serving.id);
+            await ref.read(dashboardProvider.notifier).deleteMeal(meal.id);
           },
         );
       },
@@ -238,7 +236,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         BottomNavigationBarItem(
           icon: Icon(Icons.dinner_dining_outlined),
           activeIcon: Icon(Icons.dinner_dining),
-          label: "Servings",
+          label: "Meals",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.summarize_outlined),
@@ -262,18 +260,17 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   TabBarView _tabViews(DashboardState model) {
     return TabBarView(
       children: [
-        _servingsBody(model),
+        _mealsBody(model),
         _foodsBody(model),
       ],
     );
   }
 
-  void _addServingToSummary(BuildContext context, FoodServing serving) {
-    final added =
-        ref.read(dashboardProvider.notifier).updateUsingFoodServing(serving);
+  void _addMealToSummary(BuildContext context, Meal meal) {
+    final added = ref.read(dashboardProvider.notifier).updateUsingMeal(meal);
     _showBottomMessage(
       context,
-      added ? "Added ${serving.label}" : "Food item not found for serving",
+      added ? "Added ${meal.label}" : "Food item not found for this meal",
     );
   }
 
