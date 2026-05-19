@@ -4,7 +4,7 @@ import 'package:isar/isar.dart';
 import 'package:macro_diary/features/dashboard/presentation/view/dashboard_screen.dart';
 import 'package:macro_diary/features/food/data/models/food_isar.dart';
 import 'package:macro_diary/features/food/data/services/food_local_service.dart';
-import 'package:macro_diary/features/foodServing/data/models/food_serving_isar.dart';
+import 'package:macro_diary/features/meal/data/models/meal_isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 void main() async {
@@ -14,7 +14,7 @@ void main() async {
   final isar = await Isar.open(
     [
       FoodIsarSchema,
-      FoodServingIsarSchema,
+      MealIsarSchema,
     ],
     directory: dir.path,
   );

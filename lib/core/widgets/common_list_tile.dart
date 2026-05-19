@@ -3,7 +3,7 @@ import 'package:macro_diary/core/domain/entities/macros.dart';
 import 'package:macro_diary/core/util/prints.dart';
 import 'package:macro_diary/core/widgets/ui_util.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
-import 'package:macro_diary/features/foodServing/domain/entities/food_serving.dart';
+import 'package:macro_diary/features/meal/domain/entities/meal.dart';
 
 class CommonListTile extends StatelessWidget {
   const CommonListTile.food({
@@ -13,29 +13,29 @@ class CommonListTile extends StatelessWidget {
     required this.addFun,
     required this.deleteFun,
   })  : _foodItem = foodItem,
-        _serving = null,
+        _meal = null,
         _foodsById = null;
 
-  const CommonListTile.serving({
+  const CommonListTile.meal({
     super.key,
-    required FoodServing serving,
+    required Meal meal,
     required Map<String, Food> foodsById,
     required this.editFun,
     required this.addFun,
     required this.deleteFun,
   })  : _foodItem = null,
-        _serving = serving,
+        _meal = meal,
         _foodsById = foodsById;
 
   final Food? _foodItem;
-  final FoodServing? _serving;
+  final Meal? _meal;
   final Map<String, Food>? _foodsById;
 
   final Function() editFun;
   final Function() addFun;
   final Function() deleteFun;
 
-  bool get isServing => _serving != null;
+  bool get isMeal => _meal != null;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +49,9 @@ class CommonListTile extends StatelessWidget {
     );
 
     try {
-      if (isServing) {
-        macros = _serving!.getMacros(_foodsById ?? const {});
-        title = _serving.label;
+      if (isMeal) {
+        macros = _meal!.getMacros(_foodsById ?? const {});
+        title = _meal.label;
       } else {
         macros = _foodItem!.macros;
         title = _foodItem.name;
@@ -64,7 +64,7 @@ class CommonListTile extends StatelessWidget {
 
     return ListTile(
       leading: Icon(
-        isServing ? Icons.dinner_dining : Icons.fastfood,
+        isMeal ? Icons.dinner_dining : Icons.fastfood,
       ),
       title: Text(title),
       subtitle: Text(
