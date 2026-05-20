@@ -108,12 +108,16 @@ flutter_icons:
   image_path: "assets/icons/app_icon.png"
 
 flutter_native_splash:
-  color: "#000000"        # background color
-  image: "assets/iconss/app_icon.png"  # center logo
+  color: "#FAFCF8"
+  color_dark: "#0F1513"
+  image: "assets/icons/app_icon.png"
+  image_dark: "assets/icons/app_icon.png"
   android: true
   ios: true
   fullscreen: true
 
   android_12:
-    color: "#000000"
+    color: "#FAFCF8"
+    color_dark: "#0F1513"
     image: "assets/icons/app_icon.png"
+    image_dark: "assets/icons/app_icon.png"
