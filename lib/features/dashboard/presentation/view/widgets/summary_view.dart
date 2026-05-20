@@ -70,17 +70,20 @@ class _SummaryBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black38,
-            blurRadius: 4,
-            offset: Offset(0, 2),
+            color: colorScheme.shadow.withValues(alpha: 0.10),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
-        color: Colors.green.shade400,
-        borderRadius: BorderRadius.circular(12),
+        color: colorScheme.primaryContainer,
+        border: Border.all(color: colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.all(12),
       margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -90,14 +93,18 @@ class _SummaryBlock extends StatelessWidget {
           children: [
             Text(
               "$amount",
-              style: const TextStyle(
+              style: TextStyle(
+                color: colorScheme.onPrimaryContainer,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
               title,
-              style: const TextStyle(fontSize: 12),
+              style: TextStyle(
+                color: colorScheme.onPrimaryContainer,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
