@@ -1,4 +1,4 @@
-package com.example.micro_diary
+package com.ashishapps.microdiary
 
 import io.flutter.embedding.android.FlutterActivity
 
