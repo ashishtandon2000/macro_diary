@@ -1,46 +1,75 @@
-
-
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:macro_diary/core/errors/exceptions.dart';
-import 'package:macro_diary/features/food/data/models/food_model.dart';
+import 'package:macro_diary/features/food/data/services/usda_api_service.dart';
+import 'package:mocktail/mocktail.dart';
 
-class UsdaApiService {
-  final http.Client client;
-  final String apiKey;
+class MockHttpClient extends Mock implements http.Client {}
 
+void main() {
+  late MockHttpClient client;
+  late UsdaApiService service;
 
-  const UsdaApiService({
-    required this.client,
-    required this.apiKey
+  const apiKey = "test-key";
+  final searchUri = Uri.https(
+    "api.nal.usda.gov",
+    "/fdc/v1/foods/search",
+    {
+      "query": "apple",
+      "api_key": apiKey,
+      "pageSize": "5",
+    },
+  );
+
+  setUp(() {
+    client = MockHttpClient();
+    service = UsdaApiService(client: client, apiKey: apiKey);
   });
 
-  Future searchFood(String query)async{
-    final uri = Uri.parse(
-      "https://api.nal.usda.gov/fdc/v1/foods/search"
-        '?query=$query&api_key=$apiKey&pageSize=5'
+  test("returns parsed foods from USDA search response", () async {
+    when(() => client.get(searchUri)).thenAnswer(
+      (_) async => http.Response(
+        '''
+        {
+          "foods": [
+            {
+              "fdcId": 123,
+              "description": "Apple, raw",
+              "servingSizeUnit": "g",
+              "foodNutrients": [
+                {"nutrientId": 1008, "value": 52},
+                {"nutrientId": 1003, "value": 0.3},
+                {"nutrientId": 1005, "value": 13.8},
+                {"nutrientId": 1004, "value": 0.2}
+              ]
+            }
+          ]
+        }
+        ''',
+        200,
+      ),
     );
 
-    final response = await client.get(uri);
+    final foods = await service.searchFoods("apple");
 
-    if (response.statusCode != 200) {
-      throw ServerException();
-    }
+    expect(foods, hasLength(1));
+    expect(foods.first.name, "Apple, raw");
+    expect(foods.first.externalId, "123");
+    expect(foods.first.macros.calories, 52);
+    expect(foods.first.macros.protein, 0.3);
+    expect(foods.first.macros.carbs, 13.8);
+    expect(foods.first.macros.fats, 0.2);
+    verify(() => client.get(searchUri)).called(1);
+  });
 
-    try {
-      final decoded = jsonDecode(response.body);
-      final foods = decoded['foods'] as List;
+  test("throws server exception when USDA responds with an error", () async {
+    when(() => client.get(searchUri)).thenAnswer(
+      (_) async => http.Response("{}", 500),
+    );
 
-      return foods
-          .map((json) => FoodModel.fromJson(json))
-          .toList();
-    } catch (e) {
-      throw ParsingException("Failed to parse USDA response");
-    }
-  }
-
-
-
+    expect(
+      () => service.searchFoods("apple"),
+      throwsA(isA<ServerException>()),
+    );
+  });
 }
