@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:macro_diary/core/domain/entities/macros.dart';
+import 'package:macro_diary/features/diary/data/repositories/diary_repository_impl.dart';
+import 'package:macro_diary/features/diary/domain/entities/diary_entry.dart';
+import 'package:macro_diary/features/diary/domain/repositories/diary_repository.dart';
 import 'package:macro_diary/features/food/data/repositories/food_repository_impl.dart';
 import 'package:macro_diary/features/food/domain/entities/food.dart';
 import 'package:macro_diary/features/food/domain/repositories/food_repository.dart';
@@ -22,6 +25,7 @@ final dashboardProvider =
 );
 
 class DashboardNotifier extends AsyncNotifier<DashboardState> {
+  DiaryRepository get _diaryRepository => ref.read(diaryRepositoryProvider);
   FoodRepository get _foodRepository => ref.read(foodRepositoryProvider);
   MealRepository get _mealRepository => ref.read(mealRepositoryProvider);
 
@@ -37,8 +41,7 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
     try {
       state = AsyncData(
         await _loadDashboard(
-          summary: current?.summary,
-          history: current?.history,
+          preservedEntries: current?.history,
         ),
       );
     } catch (error, stackTrace) {
@@ -47,12 +50,15 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
   }
 
   Future<DashboardState> _loadDashboard({
-    Macros? summary,
-    List<Macros>? history,
+    List<DiaryEntry>? preservedEntries,
   }) async {
+    final diaryFuture = preservedEntries == null
+        ? _diaryRepository.getEntriesForDay(DateTime.now())
+        : Future.value(preservedEntries);
     final foodsFuture = _foodRepository.getAllFoods();
     final mealsFuture = _mealRepository.getAllMeals();
 
+    final entries = await diaryFuture;
     final foods = await foodsFuture;
     final meals = await mealsFuture;
     final foodMap = {for (final food in foods) food.id: food};
@@ -60,61 +66,106 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
         meals.where((meal) => meal.hasAvailableFoods(foodMap)).toList();
 
     return DashboardState(
-      summary: summary ?? _emptyMacros,
-      history: history ?? const [],
+      summary: _sumEntries(entries),
+      history: entries,
       foods: foods,
       meals: validMeals,
       foodMap: foodMap,
     );
   }
 
-  void updateUsingMacros(Macros macros) {
-    final current = state.value;
-    if (current == null) return;
-
-    state = AsyncData(
-      current.copyWith(
-        summary: current.summary + macros,
-        history: [...current.history, macros],
+  Future<void> updateUsingMacros(Macros macros) async {
+    await _addSummaryEntry(
+      DiaryEntry(
+        id: "",
+        type: DiaryEntryType.custom,
+        title: "Manually added",
+        macros: macros,
+        consumedAt: DateTime.now(),
       ),
     );
   }
 
-  void updateUsingFood(Food food) {
-    updateUsingMacros(food.macros);
+  Future<void> updateUsingFood(Food food) async {
+    await _addSummaryEntry(
+      DiaryEntry(
+        id: "",
+        type: DiaryEntryType.food,
+        title: food.name,
+        macros: food.macros,
+        consumedAt: DateTime.now(),
+        sourceId: food.id,
+      ),
+    );
   }
 
-  bool updateUsingMeal(Meal meal) {
+  Future<bool> updateUsingMeal(Meal meal) async {
     final current = state.value;
     if (current == null) return false;
 
     if (!meal.hasAvailableFoods(current.foodMap)) return false;
 
-    updateUsingMacros(meal.getMacros(current.foodMap));
+    await _addSummaryEntry(
+      DiaryEntry(
+        id: "",
+        type: DiaryEntryType.meal,
+        title: meal.label,
+        macros: meal.getMacros(current.foodMap),
+        consumedAt: DateTime.now(),
+        sourceId: meal.id,
+        details: meal.items.map((item) {
+          final food = current.foodMap[item.foodId]!;
+          return "${food.name} - ${item.amount} ${food.unit.name}";
+        }).toList(),
+      ),
+    );
     return true;
   }
 
-  void revertLast() {
+  Future<void> revertLast() async {
     final current = state.value;
     if (current == null || current.history.isEmpty) return;
 
-    final lastMacros = current.history.last;
+    final entry = current.history.last;
+    await _diaryRepository.deleteEntry(entry.id);
+
     state = AsyncData(
       current.copyWith(
-        summary: current.summary - lastMacros,
+        summary: current.summary - entry.macros,
         history: current.history.sublist(0, current.history.length - 1),
       ),
     );
   }
 
-  void resetSummary() {
+  Future<void> resetSummary() async {
     final current = state.value;
     if (current == null) return;
+
+    await _diaryRepository.deleteEntriesForDay(DateTime.now());
 
     state = AsyncData(
       current.copyWith(
         summary: _emptyMacros,
         history: const [],
+      ),
+    );
+  }
+
+  Future<void> removeSummaryEntry(int index) async {
+    final current = state.value;
+    if (current == null || index < 0 || index >= current.history.length) {
+      return;
+    }
+
+    final entry = current.history[index];
+    await _diaryRepository.deleteEntry(entry.id);
+
+    final history = [...current.history]..removeAt(index);
+
+    state = AsyncData(
+      current.copyWith(
+        summary: current.summary - entry.macros,
+        history: history,
       ),
     );
   }
@@ -149,11 +200,33 @@ class DashboardNotifier extends AsyncNotifier<DashboardState> {
       ),
     );
   }
+
+  Future<void> _addSummaryEntry(DiaryEntry entry) async {
+    final current = state.value;
+    if (current == null) return;
+
+    final savedEntry = await _diaryRepository.addEntry(entry);
+
+    state = AsyncData(
+      current.copyWith(
+        summary: current.summary + savedEntry.macros,
+        history: [...current.history, savedEntry],
+      ),
+    );
+  }
+
+  Macros _sumEntries(List<DiaryEntry> entries) {
+    var summary = _emptyMacros;
+    for (final entry in entries) {
+      summary += entry.macros;
+    }
+    return summary;
+  }
 }
 
 class DashboardState {
   final Macros summary;
-  final List<Macros> history;
+  final List<DiaryEntry> history;
   final List<Food> foods;
   final List<Meal> meals;
   final Map<String, Food> foodMap;
@@ -172,7 +245,7 @@ class DashboardState {
 
   DashboardState copyWith({
     Macros? summary,
-    List<Macros>? history,
+    List<DiaryEntry>? history,
     List<Food>? foods,
     List<Meal>? meals,
     Map<String, Food>? foodMap,

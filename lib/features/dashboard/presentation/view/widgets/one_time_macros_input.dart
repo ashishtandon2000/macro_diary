@@ -7,7 +7,7 @@ class OneTimeMacrosInput extends StatefulWidget {
     required this.saveMacrosFunc,
   });
 
-  final ValueChanged<Macros> saveMacrosFunc;
+  final Future<void> Function(Macros macros) saveMacrosFunc;
 
   @override
   State<OneTimeMacrosInput> createState() => _OneTimeMacrosInputState();
@@ -85,8 +85,8 @@ class _OneTimeMacrosInputState extends State<OneTimeMacrosInput> {
                 heightFactor: 1,
                 alignment: Alignment.centerRight,
                 child: OutlinedButton(
-                  onPressed: () {
-                    widget.saveMacrosFunc(
+                  onPressed: () async {
+                    await widget.saveMacrosFunc(
                       Macros(
                         calories: _calories,
                         protein: _protein,
@@ -94,7 +94,9 @@ class _OneTimeMacrosInputState extends State<OneTimeMacrosInput> {
                         fats: _fats,
                       ),
                     );
-                    Navigator.of(context).pop();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
                   },
                   child: const Text("Save"),
                 ),

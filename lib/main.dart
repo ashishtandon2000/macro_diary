@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import 'package:macro_diary/features/dashboard/presentation/view/dashboard_screen.dart';
+import 'package:macro_diary/features/diary/data/models/diary_entry_isar.dart';
 import 'package:macro_diary/features/food/data/models/food_isar.dart';
 import 'package:macro_diary/features/food/data/services/food_local_service.dart';
 import 'package:macro_diary/features/meal/data/models/meal_isar.dart';
+import 'package:macro_diary/features/user_data/data/models/user_profile_isar.dart';
 import 'package:path_provider/path_provider.dart';
 
 const _lightColorScheme = ColorScheme(
@@ -91,6 +93,8 @@ void main() async {
     [
       FoodIsarSchema,
       MealIsarSchema,
+      DiaryEntryIsarSchema,
+      UserProfileIsarSchema,
     ],
     directory: dir.path,
   );

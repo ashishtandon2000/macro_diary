@@ -5,6 +5,7 @@ import 'package:macro_diary/core/widgets/ui_util.dart';
 import 'package:macro_diary/features/dashboard/presentation/view/widgets/one_time_macros_input.dart';
 import 'package:macro_diary/features/dashboard/presentation/view/widgets/summary_view.dart';
 import 'package:macro_diary/features/dashboard/presentation/view_model/dashboard_viewmodel.dart';
+import 'package:macro_diary/features/diary/domain/entities/diary_entry.dart';
 import 'package:macro_diary/features/food/presentation/view/manage_food_screen.dart';
 import 'package:macro_diary/features/meal/domain/entities/meal.dart';
 import 'package:macro_diary/features/meal/presentation/view/manage_meal_screen.dart';
@@ -19,6 +20,7 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   // 0-meal, 1-summary, 2-food
   int _bottomBarIndex = 1;
+  bool _showSummaryDetails = false;
 
   Future<void> _navigateToManageFood([String? foodId]) async {
     await Navigator.of(context).push(
@@ -79,7 +81,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         actions: [
           if (model?.showRevertIcon == true)
             IconButton(
-              onPressed: notif.revertLast,
+              onPressed: () => notif.revertLast(),
               icon: const Icon(Icons.undo),
             ),
           IconButton(
@@ -92,7 +94,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                       msg: "Are you sure, you want to reset the summary?",
                     );
                     if (confirmed == true) {
-                      notif.resetSummary();
+                      await notif.resetSummary();
                     }
                   },
             icon: const Icon(Icons.refresh),
@@ -136,46 +138,100 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       children: [
         SummaryView(summary: model.summary),
         const SizedBox(height: 20),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              OutlinedButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => Dialog(
-                      child: OneTimeMacrosInput(
-                        saveMacrosFunc: notif.updateUsingMacros,
-                      ),
-                    ),
-                  );
-                },
-                child: const Text("Add Onetime Macros"),
+        _summaryActions(notif),
+        if (_showSummaryDetails)
+          Expanded(child: _summaryDetails(model))
+        else
+          Expanded(
+            child: DefaultTabController(
+              length: 2,
+              child: Column(
+                children: [
+                  const TabBar(
+                    tabs: [
+                      Tab(child: Text("Recent Meals")),
+                      Tab(child: Text("Saved Foods")),
+                    ],
+                  ),
+                  Expanded(
+                    child: _tabViews(model),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                const TabBar(
-                  tabs: [
-                    Tab(child: Text("Recent Meals")),
-                    Tab(child: Text("Saved Foods")),
-                  ],
-                ),
-                Expanded(
-                  child: _tabViews(model),
-                ),
-              ],
             ),
           ),
-        ),
       ],
+    );
+  }
+
+  Widget _summaryActions(DashboardNotifier notif) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          OutlinedButton.icon(
+            onPressed: () {
+              setState(() {
+                _showSummaryDetails = !_showSummaryDetails;
+              });
+            },
+            icon: Icon(
+              _showSummaryDetails ? Icons.keyboard_arrow_left : Icons.list_alt,
+            ),
+            label: Text(_showSummaryDetails ? "Back" : "View Details"),
+          ),
+          if (!_showSummaryDetails) ...[
+            const SizedBox(width: 8),
+            OutlinedButton.icon(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: OneTimeMacrosInput(
+                      saveMacrosFunc: notif.updateUsingMacros,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.add),
+              label: const Text("Add Onetime"),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _summaryDetails(DashboardState model) {
+    if (model.history.isEmpty) {
+      return UIUtil.nullScreenMsg("No macros added yet.");
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      itemCount: model.history.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final entry = model.history[index];
+        return ListTile(
+          leading: Icon(_summaryEntryIcon(entry.type)),
+          title: Text("${entry.typeLabel}: ${entry.title}"),
+          subtitle: Text(_summaryEntrySubtitle(entry)),
+          isThreeLine: entry.details.isNotEmpty,
+          trailing: IconButton(
+            tooltip: "Remove",
+            onPressed: () async {
+              await ref
+                  .read(dashboardProvider.notifier)
+                  .removeSummaryEntry(index);
+              if (!context.mounted) return;
+              _showBottomMessage(context, "Removed ${entry.title}");
+            },
+            icon: const Icon(Icons.delete_outline),
+          ),
+        );
+      },
     );
   }
 
@@ -216,8 +272,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         final foodItem = model.foods[index];
         return CommonListTile.food(
           foodItem: foodItem,
-          addFun: () {
-            ref.read(dashboardProvider.notifier).updateUsingFood(foodItem);
+          addFun: () async {
+            await ref
+                .read(dashboardProvider.notifier)
+                .updateUsingFood(foodItem);
+            if (!context.mounted) return;
             _showBottomMessage(context, "Added ${foodItem.name}");
           },
           editFun: () => _navigateToManageFood(foodItem.id),
@@ -252,6 +311,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       onTap: (index) {
         setState(() {
           _bottomBarIndex = index;
+          if (_bottomBarIndex != 1) {
+            _showSummaryDetails = false;
+          }
         });
       },
     );
@@ -266,8 +328,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  void _addMealToSummary(BuildContext context, Meal meal) {
-    final added = ref.read(dashboardProvider.notifier).updateUsingMeal(meal);
+  Future<void> _addMealToSummary(BuildContext context, Meal meal) async {
+    final added =
+        await ref.read(dashboardProvider.notifier).updateUsingMeal(meal);
+    if (!context.mounted) return;
     _showBottomMessage(
       context,
       added ? "Added ${meal.label}" : "Food item not found for this meal",
@@ -276,5 +340,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
 
   void _showBottomMessage(BuildContext context, String message) {
     UIUtil.bottomNotifier(context: context, message: message);
+  }
+
+  IconData _summaryEntryIcon(DiaryEntryType type) {
+    switch (type) {
+      case DiaryEntryType.custom:
+        return Icons.edit_note;
+      case DiaryEntryType.food:
+        return Icons.fastfood;
+      case DiaryEntryType.meal:
+        return Icons.dinner_dining;
+    }
+  }
+
+  String _summaryEntrySubtitle(DiaryEntry entry) {
+    final macros = entry.macros;
+    final lines = [
+      "Calories: ${macros.calories} | "
+          "Protein: ${macros.protein} | "
+          "Fats: ${macros.fats} | "
+          "Carbs: ${macros.carbs}",
+      if (entry.details.isNotEmpty) entry.details.join(", "),
+    ];
+
+    return lines.join("\n");
   }
 }
