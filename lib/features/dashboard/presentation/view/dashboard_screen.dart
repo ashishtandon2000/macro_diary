@@ -9,6 +9,7 @@ import 'package:macro_diary/features/diary/domain/entities/diary_entry.dart';
 import 'package:macro_diary/features/food/presentation/view/manage_food_screen.dart';
 import 'package:macro_diary/features/meal/domain/entities/meal.dart';
 import 'package:macro_diary/features/meal/presentation/view/manage_meal_screen.dart';
+import 'package:macro_diary/features/settings/presentation/view/settings_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -37,6 +38,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       MaterialPageRoute(
         builder: (context) => ManageMeal(mealId: mealId),
       ),
+    );
+
+    if (mounted) {
+      await ref.read(dashboardProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _navigateToSettings() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
     );
 
     if (mounted) {
@@ -76,6 +87,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     final notif = ref.read(dashboardProvider.notifier);
 
     return Scaffold(
+      drawer: _drawer(),
       appBar: AppBar(
         title: const Text("Macro Diary"),
         actions: [
@@ -113,6 +125,33 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               onPressed: model == null ? null : () => _addButtonAction(model),
               child: const Icon(Icons.add),
             ),
+    );
+  }
+
+  Widget _drawer() {
+    return Drawer(
+      child: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            ListTile(
+              title: Text(
+                "Macro Diary",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.settings_outlined),
+              title: const Text("Settings"),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _navigateToSettings();
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
