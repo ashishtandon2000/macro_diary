@@ -454,9 +454,11 @@ class BackupService {
   Map<String, dynamic> _userProfileToJson(UserProfileIsar profile) {
     return {
       "name": profile.name,
+      "gender": profile.gender,
       "age": profile.age,
       "heightCm": profile.heightCm,
       "weightKg": profile.weightKg,
+      "activityLevel": profile.activityLevel,
       "goalType": profile.goalType,
       "targetCalories": profile.targetCalories,
       "targetProtein": profile.targetProtein,
@@ -473,9 +475,11 @@ class BackupService {
     return UserProfileIsar()
       ..id = 1
       ..name = _stringValue(json["name"])
+      ..gender = _stringValue(json["gender"])
       ..age = _nullableInt(json["age"])
       ..heightCm = _nullableDouble(json["heightCm"])
       ..weightKg = _nullableDouble(json["weightKg"])
+      ..activityLevel = _stringValue(json["activityLevel"])
       ..goalType = _stringValue(json["goalType"])
       ..targetCalories = _doubleValue(json["targetCalories"])
       ..targetProtein = _doubleValue(json["targetProtein"])

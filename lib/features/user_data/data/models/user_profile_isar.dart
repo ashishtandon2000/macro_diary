@@ -7,9 +7,11 @@ class UserProfileIsar {
   Id id = 1;
 
   String name = "";
+  String gender = "";
   int? age;
   double? heightCm;
   double? weightKg;
+  String activityLevel = "";
 
   String goalType = "";
   double targetCalories = 0;
