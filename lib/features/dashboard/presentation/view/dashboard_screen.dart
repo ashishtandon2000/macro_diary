@@ -11,6 +11,7 @@ import 'package:macro_diary/features/meal/domain/entities/meal.dart';
 import 'package:macro_diary/features/meal/presentation/view/manage_meal_screen.dart';
 import 'package:macro_diary/features/settings/presentation/view/settings_screen.dart';
 import 'package:macro_diary/features/user_data/presentation/view/personal_details_screen.dart';
+import 'package:macro_diary/features/user_data/presentation/view/targets_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -59,6 +60,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Future<void> _navigateToPersonalDetails() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const PersonalDetailsScreen()),
+    );
+
+    if (mounted) {
+      await ref.read(dashboardProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _navigateToTargets() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const TargetsScreen()),
     );
 
     if (mounted) {
@@ -158,6 +169,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               onTap: () async {
                 Navigator.of(context).pop();
                 await _navigateToPersonalDetails();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.track_changes_outlined),
+              title: const Text("Targets"),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _navigateToTargets();
               },
             ),
             ListTile(
