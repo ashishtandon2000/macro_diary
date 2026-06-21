@@ -49,6 +49,19 @@ extension ActivityLevelInfo on ActivityLevel {
   }
 
   String get fullLabel => "$label - $description";
+
+  double get multiplier {
+    switch (this) {
+      case ActivityLevel.sedentary:
+        return 1.2;
+      case ActivityLevel.lightlyActive:
+        return 1.375;
+      case ActivityLevel.moderatelyActive:
+        return 1.55;
+      case ActivityLevel.veryActive:
+        return 1.725;
+    }
+  }
 }
 
 Gender? genderFromName(String value) {
