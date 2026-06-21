@@ -10,6 +10,8 @@ import 'package:macro_diary/features/food/presentation/view/manage_food_screen.d
 import 'package:macro_diary/features/meal/domain/entities/meal.dart';
 import 'package:macro_diary/features/meal/presentation/view/manage_meal_screen.dart';
 import 'package:macro_diary/features/settings/presentation/view/settings_screen.dart';
+import 'package:macro_diary/features/user_data/presentation/view/personal_details_screen.dart';
+import 'package:macro_diary/features/user_data/presentation/view/targets_screen.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -48,6 +50,26 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Future<void> _navigateToSettings() async {
     await Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
+
+    if (mounted) {
+      await ref.read(dashboardProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _navigateToPersonalDetails() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const PersonalDetailsScreen()),
+    );
+
+    if (mounted) {
+      await ref.read(dashboardProvider.notifier).refresh();
+    }
+  }
+
+  Future<void> _navigateToTargets() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const TargetsScreen()),
     );
 
     if (mounted) {
@@ -141,6 +163,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
             ),
             const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person_outline),
+              title: const Text("Personal Details"),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _navigateToPersonalDetails();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.track_changes_outlined),
+              title: const Text("Targets"),
+              onTap: () async {
+                Navigator.of(context).pop();
+                await _navigateToTargets();
+              },
+            ),
             ListTile(
               leading: const Icon(Icons.settings_outlined),
               title: const Text("Settings"),
