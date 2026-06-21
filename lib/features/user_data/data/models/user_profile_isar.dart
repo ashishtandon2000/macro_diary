@@ -22,5 +22,7 @@ class UserProfileIsar {
   double? bmr;
   double? tdee;
   bool hasCompletedGuide = false;
+  DateTime? personalDetailsUpdatedAt;
+  DateTime? targetUpdatedAt;
   DateTime updatedAt = DateTime.now();
 }

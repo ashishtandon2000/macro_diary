@@ -467,6 +467,9 @@ class BackupService {
       "bmr": profile.bmr,
       "tdee": profile.tdee,
       "hasCompletedGuide": profile.hasCompletedGuide,
+      "personalDetailsUpdatedAt":
+          profile.personalDetailsUpdatedAt?.toIso8601String(),
+      "targetUpdatedAt": profile.targetUpdatedAt?.toIso8601String(),
       "updatedAt": profile.updatedAt.toIso8601String(),
     };
   }
@@ -488,6 +491,10 @@ class BackupService {
       ..bmr = _nullableDouble(json["bmr"])
       ..tdee = _nullableDouble(json["tdee"])
       ..hasCompletedGuide = json["hasCompletedGuide"] == true
+      ..personalDetailsUpdatedAt =
+          DateTime.tryParse(_stringValue(json["personalDetailsUpdatedAt"]))
+      ..targetUpdatedAt =
+          DateTime.tryParse(_stringValue(json["targetUpdatedAt"]))
       ..updatedAt =
           DateTime.tryParse(_stringValue(json["updatedAt"])) ?? DateTime.now();
   }

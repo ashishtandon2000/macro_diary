@@ -65,8 +65,10 @@ class PersonalDetailsNotifier
 
     try {
       final profile = await _isar.userProfileIsars.get(1) ?? UserProfileIsar();
+      final now = DateTime.now();
       final updatedProfile = inputs.applyToProfile(profile)
-        ..updatedAt = DateTime.now();
+        ..personalDetailsUpdatedAt = now
+        ..updatedAt = now;
 
       await _isar.writeTxn(() async {
         await _isar.userProfileIsars.put(updatedProfile);
